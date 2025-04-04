@@ -1,21 +1,26 @@
-MIT License
+# Personal and Non-Commercial Use License — Compos TFT
 
-Copyright (c) 2025 Camila Fernanda Torres Parra
+Copyright **(c)** 2025 __Camila Fernanda Torres Parra__
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+This software is open-source and available for use, modification, and distribution under the following conditions:
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+1. **Personal and Educational Use**  
+   You are free to use this project for personal, educational, or non-commercial purposes without any restrictions.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+2. **Commercial or Profit-Driven Use**  
+   If you wish to use this software as the base for a project, product, or service that:
+   - Generates revenue directly or indirectly (e.g. subscriptions, product sales, service offerings, etc.)
+   - Is distributed within an organization with active users (internal or external)
+   - Becomes part of a monetizable public or private platform
+
+   Then you are required to obtain **explicit permission** and agree to a **commercial license or fair compensation** with the author, Camila Fernanda Torres Parra.
+
+3. **Contact**  
+   For commercial licensing or collaboration inquiries, please contact: [camiicode@gmail.com](mailto:camiicode@gmail.com)
+
+4. **Rights Reserved**  
+   This license does not grant rights to sublicense, resell, or modify with the intent of circumventing these conditions. All rights not expressly granted are reserved.
+
+---
+
+This file must accompany any redistribution of the source code.
