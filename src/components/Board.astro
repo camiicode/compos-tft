@@ -25,6 +25,13 @@ for (let row = 0; row < 3; row++) {
             <button id="save-comp" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded">
                 Guardar 💾
             </button>
+            <button id="download-comp" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">
+                Exportar 📥
+            </button>
+            <label for="upload-comp" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded cursor-pointer">
+                Importar 📤
+            </label>
+            <input type="file" id="upload-comp" accept=".json" class="hidden" />
             <button id="clear-comp" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded">
                 Limpiar 🗑️
             </button>
@@ -529,8 +536,8 @@ for (let row = 0; row < 3; row++) {
         }[];
     }
 
-    // Función para guardar la composición actual
-    function saveComposition() {
+    // Función para obtener la composición actual
+    function getCurrentComposition(): StoredChampion[] {
         const composition: StoredChampion[] = [];
         const championCards = document.querySelectorAll('.hex-cell .champion-card');
         
@@ -575,6 +582,13 @@ for (let row = 0; row < 3; row++) {
             });
         });
         
+        return composition;
+    }
+
+    // Función para guardar la composición actual
+    function saveComposition() {
+        const composition = getCurrentComposition();
+        
         // Guardar en localStorage
         localStorage.setItem('tft-composition', JSON.stringify(composition));
         
@@ -582,7 +596,39 @@ for (let row = 0; row < 3; row++) {
         showToast('Composición guardada correctamente');
     }
     
-    // Función para cargar la composición guardada
+    // Función para descargar la composición como JSON
+    function downloadComposition() {
+        const composition = getCurrentComposition();
+        
+        if (composition.length === 0) {
+            showToast('No hay campeones en el tablero', true);
+            return;
+        }
+        
+        // Crear un objeto Blob con los datos y configurar el enlace de descarga
+        const json = JSON.stringify(composition, null, 2);
+        const blob = new Blob([json], { type: 'application/json' });
+        
+        // Crear un enlace temporal para la descarga
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        const date = new Date();
+        const formattedDate = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
+        a.download = `tft-composition-${formattedDate}.json`;
+        
+        // Simular clic para iniciar descarga
+        document.body.appendChild(a);
+        a.click();
+        
+        // Limpiar
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        
+        showToast('Composición descargada correctamente');
+    }
+    
+    // Función para cargar la composición guardada en localStorage
     function loadComposition() {
         const storedComp = localStorage.getItem('tft-composition');
         if (!storedComp) return;
@@ -687,6 +733,135 @@ for (let row = 0; row < 3; row++) {
         }
     }
     
+    // Función para subir una composición
+    function uploadComposition(event: Event) {
+        const input = event.target as HTMLInputElement;
+        
+        if (!input.files || input.files.length === 0) {
+            return;
+        }
+        
+        const file = input.files[0];
+        const reader = new FileReader();
+        
+        reader.onload = function(e) {
+            try {
+                const text = e.target?.result as string;
+                const composition: StoredChampion[] = JSON.parse(text);
+                
+                // Limpiar el tablero primero
+                document.querySelectorAll('.hex-cell .hex-content').forEach(cell => {
+                    cell.innerHTML = '';
+                });
+                
+                // Cargar la composición
+                composition.forEach(champion => {
+                    const { row, col } = champion.position;
+                    const cell = document.querySelector(`.hex-cell[data-row="${row}"][data-col="${col}"]`);
+                    
+                    if (!cell) return;
+                    
+                    const hexContent = cell.querySelector('.hex-content');
+                    if (!hexContent) return;
+                    
+                    // Crear el campeón
+                    const championCard = document.createElement('div');
+                    championCard.className = 'champion-card relative';
+                    
+                    // Crear la imagen del campeón
+                    const img = document.createElement('img');
+                    img.src = champion.icon;
+                    img.alt = champion.name;
+                    img.title = champion.name;
+                    img.setAttribute('data-champion-id', champion.id);
+                    img.className = 'w-16 h-16 rounded-full object-cover object-right';
+                    
+                    // Crear estrellas
+                    const levelDiv = document.createElement('div');
+                    levelDiv.className = 'star-level absolute -top-2 left-1/2 transform -translate-x-1/2 text-yellow-400';
+                    levelDiv.textContent = '⭐'.repeat(champion.level);
+                    
+                    // Crear badge de costo
+                    const costDiv = document.createElement('div');
+                    costDiv.className = 'cost-badge mt-1 absolute -bottom-2 left-1/2 transform -translate-x-1/2 bg-gray-800 bg-opacity-80 rounded-full px-2 py-1 text-sm flex items-center';
+                    costDiv.innerHTML = `<span class="mr-1">🥮</span> ${champion.cost}`;
+                    
+                    // Crear controles
+                    const controlsDiv = document.createElement('div');
+                    controlsDiv.className = 'champion-controls absolute -top-1 left-0 right-0 opacity-0 transition-opacity flex justify-center space-x-1 z-10';
+                    
+                    const decreaseBtn = document.createElement('button');
+                    decreaseBtn.className = 'decrease-level bg-red-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs';
+                    decreaseBtn.title = 'Disminuir nivel';
+                    decreaseBtn.textContent = '-';
+                    
+                    const increaseBtn = document.createElement('button');
+                    increaseBtn.className = 'increase-level bg-green-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs';
+                    increaseBtn.title = 'Aumentar nivel';
+                    increaseBtn.textContent = '+';
+                    
+                    const removeBtn = document.createElement('button');
+                    removeBtn.className = 'remove-champion bg-gray-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs';
+                    removeBtn.title = 'Eliminar campeón';
+                    removeBtn.textContent = '×';
+                    
+                    controlsDiv.appendChild(decreaseBtn);
+                    controlsDiv.appendChild(increaseBtn);
+                    controlsDiv.appendChild(removeBtn);
+                    
+                    // Agregar todo al campeón
+                    championCard.appendChild(img);
+                    championCard.appendChild(levelDiv);
+                    championCard.appendChild(costDiv);
+                    championCard.appendChild(controlsDiv);
+                    
+                    // Agregar ítems si existen
+                    if (champion.items.length > 0) {
+                        const itemsContainer = document.createElement('div');
+                        itemsContainer.className = 'items-container absolute -bottom-4 left-1/2 transform -translate-x-1/2 flex justify-center gap-1';
+                        
+                        champion.items.forEach(item => {
+                            const itemImg = document.createElement('img');
+                            itemImg.src = item.icon;
+                            itemImg.alt = item.name;
+                            itemImg.title = item.name;
+                            itemImg.setAttribute('data-item-id', item.id);
+                            itemImg.className = 'w-6 h-6 object-cover border-1 border-solid border-yellow-600 object-right';
+                            
+                            itemsContainer.appendChild(itemImg);
+                        });
+                        
+                        championCard.appendChild(itemsContainer);
+                    }
+                    
+                    hexContent.appendChild(championCard);
+                    
+                    // Configurar los controles para este campeón
+                    setupChampionControls(championCard);
+                });
+                
+                showToast('Composición importada correctamente');
+                
+                // También guardar en localStorage para mantener consistencia
+                localStorage.setItem('tft-composition', text);
+            } catch (error) {
+                console.error('Error cargando el archivo:', error);
+                showToast('Error al cargar el archivo. Formato inválido.', true);
+            }
+            
+            // Resetear el input para permitir seleccionar el mismo archivo nuevamente
+            input.value = '';
+        };
+        
+        reader.onerror = function() {
+            showToast('Error al leer el archivo', true);
+            // Resetear el input
+            input.value = '';
+        };
+        
+        reader.readAsText(file);
+    }
+    
     // Función para limpiar todo el tablero
     function clearBoard() {
         document.querySelectorAll('.hex-cell .hex-content').forEach(cell => {
@@ -716,12 +891,24 @@ for (let row = 0; row < 3; row++) {
         saveBtn.addEventListener('click', saveComposition);
     }
     
+    // Evento para descargar la composición
+    const downloadBtn = document.getElementById('download-comp');
+    if (downloadBtn) {
+        downloadBtn.addEventListener('click', downloadComposition);
+    }
+    
+    // Evento para subir una composición
+    const uploadInput = document.getElementById('upload-comp') as HTMLInputElement;
+    if (uploadInput) {
+        uploadInput.addEventListener('change', uploadComposition);
+    }
+    
     // Evento para limpiar el tablero
     const clearBtn = document.getElementById('clear-comp');
     if (clearBtn) {
         clearBtn.addEventListener('click', clearBoard);
     }
-    
+
     // Cargar composición al iniciar
     window.addEventListener('DOMContentLoaded', loadComposition);
 </script>
