@@ -18,21 +18,21 @@ for (let row = 0; row < 3; row++) {
 }
 ---
 
-<div class="max-w-screen-xl mx-auto px-4">
-    <div class="flex justify-between items-center mb-4">
-        <h1 class="text-2xl font-bold">TFT Compositor</h1>
-        <div class="flex space-x-2">
-            <button id="save-comp" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded">
+<div class="max-w-screen-xl mx-auto px-2 sm:px-4">
+    <div class="flex flex-col sm:flex-row justify-between items-center mb-4 gap-2">
+        <h1 class="text-xl sm:text-2xl font-bold">TFT Compositor</h1>
+        <div class="flex flex-wrap justify-center gap-2">
+            <button id="save-comp" class="bg-green-600 hover:bg-green-700 text-white px-2 py-1 sm:px-4 sm:py-2 rounded text-sm sm:text-base">
                 Guardar 💾
             </button>
-            <button id="download-comp" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">
+            <button id="download-comp" class="bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 sm:px-4 sm:py-2 rounded text-sm sm:text-base">
                 Exportar 📥
             </button>
-            <label for="upload-comp" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded cursor-pointer">
+            <label for="upload-comp" class="bg-purple-600 hover:bg-purple-700 text-white px-2 py-1 sm:px-4 sm:py-2 rounded cursor-pointer text-sm sm:text-base">
                 Importar 📤
             </label>
             <input type="file" id="upload-comp" accept=".json" class="hidden" />
-            <button id="clear-comp" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded">
+            <button id="clear-comp" class="bg-red-600 hover:bg-red-700 text-white px-2 py-1 sm:px-4 sm:py-2 rounded text-sm sm:text-base">
                 Limpiar 🗑️
             </button>
         </div>
@@ -54,36 +54,36 @@ for (let row = 0; row < 3; row++) {
                                     src={cell.champion.icon} 
                                     alt={cell.champion.name} 
                                     title={cell.champion.name}
-                                    class="w-16 h-16 rounded-full object-cover object-right"
+                                    class="w-10 h-10 sm:w-16 sm:h-16 rounded-full object-cover object-right"
                                 />
-                                <div class="star-level absolute -top-2 left-1/2 transform -translate-x-1/2 text-yellow-400">
+                                <div class="star-level absolute -top-2 sm:-top-5 left-1/2 transform -translate-x-1/2 text-yellow-400 text-xs sm:text-base">
                                     {'⭐'.repeat(cell.champion.level || 1)}
                                 </div>
                                 
-                                <div class="champion-controls absolute -top-1 left-0 right-0 opacity-0 transition-opacity flex justify-center space-x-1 z-10">
-                                    <button class="decrease-level bg-red-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs" title="Disminuir nivel">
+                                <div class="champion-controls absolute -top-1 sm:-top-1 left-0 right-0 opacity-0 transition-opacity flex justify-center space-x-1 z-10">
+                                    <button class="decrease-level bg-red-600 text-white rounded-full w-4 h-4 sm:w-5 sm:h-5 flex items-center justify-center text-xs" title="Disminuir nivel">
                                         -
                                     </button>
-                                    <button class="increase-level bg-green-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs" title="Aumentar nivel">
+                                    <button class="increase-level bg-green-600 text-white rounded-full w-4 h-4 sm:w-5 sm:h-5 flex items-center justify-center text-xs" title="Aumentar nivel">
                                         +
                                     </button>
-                                    <button class="remove-champion bg-gray-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs" title="Eliminar campeón">
+                                    <button class="remove-champion bg-gray-600 text-white rounded-full w-4 h-4 sm:w-5 sm:h-5 flex items-center justify-center text-xs" title="Eliminar campeón">
                                         ×
                                     </button>
                                 </div>
                                 
-                                <div class="cost-badge mt-1 absolute -bottom-2 left-1/2 transform -translate-x-1/2 bg-gray-800 bg-opacity-80 rounded-full px-2 py-1 text-sm flex items-center">
+                                <div class="cost-badge absolute -bottom-1 sm:-bottom-2 left-1/2 transform -translate-x-1/2 bg-gray-800 bg-opacity-80 rounded-full px-1 py-0.5 sm:px-2 sm:py-1 text-xs sm:text-sm flex items-center">
                                     <span class="mr-1">🥮</span> {cell.champion.cost}
                                 </div>
                                 
                                 {cell.champion.items && cell.champion.items.length > 0 && (
-                                    <div class="items-container absolute -bottom-4 left-1/2 transform -translate-x-1/2 flex justify-center gap-1">
+                                    <div class="items-container absolute -bottom-4 sm:-bottom-8 left-1/2 transform -translate-x-1/2 flex justify-center gap-1">
                                         {cell.champion.items.map((item) => (
                                             <img 
                                                 src={item.icon} 
                                                 alt={item.name} 
                                                 title={item.name}
-                                                class="w-6 h-6 object-cover border-1 border-solid border-yellow-600 object-right"
+                                                class="w-4 h-4 sm:w-6 sm:h-6 object-cover object-right border-2 border-yellow-400"
                                             />
                                         ))}
                                     </div>
@@ -99,12 +99,12 @@ for (let row = 0; row < 3; row++) {
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
         <div class="champions-container">
             <div class="flex justify-between items-center mb-2">
-                <h2 class="text-xl font-bold">Campeones Disponibles</h2>
+                <h2 class="text-lg sm:text-xl font-bold">Campeones</h2>
                 <div class="flex space-x-2">
-                    <button id="show-more-champions" class="bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded text-sm">
+                    <button id="show-more-champions" class="bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded text-xs sm:text-sm">
                         Ver más
                     </button>
-                    <button id="hide-champions" class="bg-gray-600 hover:bg-gray-700 text-white px-2 py-1 rounded text-sm">
+                    <button id="hide-champions" class="bg-gray-600 hover:bg-gray-700 text-white px-2 py-1 rounded text-xs sm:text-sm">
                         Ver menos
                     </button>
                 </div>
@@ -114,13 +114,13 @@ for (let row = 0; row < 3; row++) {
                     type="text" 
                     id="champion-search" 
                     placeholder="Buscar campeón..." 
-                    class="w-full p-2 bg-gray-800 rounded-lg text-white"
+                    class="w-full p-2 bg-gray-800 rounded-lg text-white text-sm"
                 />
             </div>
-            <div class="grid grid-cols-4 md:grid-cols-5 gap-2" id="champions-list">
+            <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2" id="champions-list">
                 {champions.map((champion, index) => (
                     <div
-                        class={`champion-card-grid bg-gray-800 rounded-lg p-2 cursor-move ${index >= 15 ? 'hidden initial-hidden' : ''}`}
+                        class={`champion-card-grid bg-gray-800 rounded-lg p-1 sm:p-2 cursor-move ${index >= 15 ? 'hidden initial-hidden' : ''}`}
                         draggable="true"
                         data-champion-id={champion.id}
                     >
@@ -129,9 +129,9 @@ for (let row = 0; row < 3; row++) {
                                 src={champion.icon} 
                                 alt={champion.name} 
                                 title={champion.name}
-                                class="w-16 h-16 rounded-full object-cover object-right"
+                                class="w-10 h-10 sm:w-16 sm:h-16 rounded-full object-cover object-right"
                             />
-                            <div class="absolute top-0 right-0 bg-yellow-500 text-black rounded-full w-6 h-6 flex items-center justify-center" title="Costo">
+                            <div class="absolute top-0 right-0 bg-yellow-500 text-black rounded-full w-4 h-4 sm:w-6 sm:h-6 flex items-center justify-center text-xs" title="Costo">
                                 {champion.cost}
                             </div>
                         </div>
@@ -142,12 +142,12 @@ for (let row = 0; row < 3; row++) {
 
         <div class="items-container">
             <div class="flex justify-between items-center mb-2">
-                <h2 class="text-xl font-bold">Items Disponibles</h2>
+                <h2 class="text-lg sm:text-xl font-bold">Objetos</h2>
                 <div class="flex space-x-2">
-                    <button id="show-more-items" class="bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded text-sm">
+                    <button id="show-more-items" class="bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded text-xs sm:text-sm">
                         Ver más
                     </button>
-                    <button id="hide-items" class="bg-gray-600 hover:bg-gray-700 text-white px-2 py-1 rounded text-sm">
+                    <button id="hide-items" class="bg-gray-600 hover:bg-gray-700 text-white px-2 py-1 rounded text-xs sm:text-sm">
                         Ver menos
                     </button>
                 </div>
@@ -156,14 +156,14 @@ for (let row = 0; row < 3; row++) {
                 <input 
                     type="text" 
                     id="item-search" 
-                    placeholder="Buscar item..." 
-                    class="w-full p-2 bg-gray-800 rounded-lg text-white"
+                    placeholder="Buscar objeto..." 
+                    class="w-full p-2 bg-gray-800 rounded-lg text-white text-sm"
                 />
             </div>
-            <div class="grid grid-cols-4 md:grid-cols-5 gap-2" id="items-list">
+            <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2" id="items-list">
                 {items.map((item, index) => (
                     <div
-                        class={`item-card bg-gray-800 rounded-lg p-2 cursor-move ${index >= 10 ? 'hidden initial-hidden' : ''}`}
+                        class={`item-card bg-gray-800 rounded-lg p-1 sm:p-2 cursor-move ${index >= 10 ? 'hidden initial-hidden' : ''}`}
                         draggable="true"
                         data-item-id={item.id}
                     >
@@ -172,9 +172,9 @@ for (let row = 0; row < 3; row++) {
                                 src={item.icon} 
                                 alt={item.name} 
                                 title={item.name}
-                                class="w-16 h-16 rounded-full object-cover object-right"
+                                class="w-30 h-30 sm:w-20 sm:h-20 object-cover object-right border-2 border-yellow-400"
                             />
-                            <p class="text-xs mt-1 text-center text-gray-300">{item.name}</p>
+                            <p class="text-xs mt-1 text-center text-gray-300 truncate w-full">{item.name}</p>
                         </div>
                     </div>
                 ))}
@@ -184,6 +184,9 @@ for (let row = 0; row < 3; row++) {
 </div>
 
 <script>
+    // Definimos la variable draggedElement al principio del script
+    let draggedElement: Element | null = null;
+
     // Funcionalidad para mostrar más campeones
     const showMoreChampionsBtn = document.getElementById('show-more-champions');
     const hideChampionsBtn = document.getElementById('hide-champions');
@@ -295,12 +298,54 @@ for (let row = 0; row < 3; row++) {
     const itemCards = document.querySelectorAll('.item-card');
     const cells = document.querySelectorAll('.hex-cell');
 
+    // Corregir la función para incluir el tipo de parámetro
+    function isChampionOnBoard(championId: string): boolean {
+        const boardCells = document.querySelectorAll('.hex-content');
+        for (const cell of boardCells) {
+            const championCard = cell.querySelector('.champion-card');
+            if (championCard) {
+                const img = championCard.querySelector('img');
+                if (img && img.getAttribute('data-champion-id') === championId) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    // Corregir la función para seleccionar correctamente los elementos y actualizarla
+    function updateChampionsVisualState(): void {
+        const championsList = document.querySelectorAll('.champion-card-grid');
+        
+        championsList.forEach(card => {
+            const championId = card.getAttribute('data-champion-id');
+            if (championId && isChampionOnBoard(championId)) {
+                card.classList.add('opacity-50');
+                card.setAttribute('data-on-board', 'true');
+                // Desactivar el drag para campeones en tablero
+                card.setAttribute('draggable', 'false');
+            } else {
+                card.classList.remove('opacity-50');
+                card.removeAttribute('data-on-board');
+                card.setAttribute('draggable', 'true');
+            }
+        });
+    }
+
     // Eventos para campeones
     championCards.forEach(card => {
         card.addEventListener('dragstart', function(e: Event) {
             const dragEvent = e as DragEvent;
+            // Comprobar si ya está en el tablero
+            const championId = card.getAttribute('data-champion-id');
+            if (championId && isChampionOnBoard(championId)) {
+                dragEvent.preventDefault();
+                showToast('Este campeón ya está en el tablero', true);
+                return;
+            }
+            
             if (dragEvent.dataTransfer) {
-                dragEvent.dataTransfer.setData('text/plain', card.getAttribute('data-champion-id') || '');
+                dragEvent.dataTransfer.setData('text/plain', championId || '');
                 card.classList.add('opacity-50');
             }
         });
@@ -360,6 +405,8 @@ for (let row = 0; row < 3; row++) {
                 const hexContent = championCard.closest('.hex-content');
                 if (hexContent) {
                     hexContent.innerHTML = '';
+                    // Actualizar el estado visual después de eliminar
+                    updateChampionsVisualState();
                 }
             });
         }
@@ -388,6 +435,12 @@ for (let row = 0; row < 3; row++) {
             const itemCard = document.querySelector(`[data-item-id="${id}"]`);
 
             if (championCard) {
+                // Verificar si el campeón ya está en el tablero
+                const championId = championCard.getAttribute('data-champion-id');
+                if (championId && isChampionOnBoard(championId)) {
+                    return;
+                }
+                
                 // Si ya hay un campeón en la celda, incrementar su nivel
                 const existingChampion = cell.querySelector('.champion-card');
                 if (existingChampion) {
@@ -415,34 +468,35 @@ for (let row = 0; row < 3; row++) {
                             newImg.src = champImg.src;
                             newImg.alt = champImg.alt;
                             newImg.title = champImg.title;
-                            newImg.className = 'w-16 h-16 rounded-full object-cover object-right';
+                            newImg.className = 'w-10 h-10 sm:w-16 sm:h-16 rounded-full object-cover object-right';
+                            newImg.setAttribute('data-champion-id', championCard.getAttribute('data-champion-id') || '');
                             
                             // Añadir las estrellas
                             const levelDiv = document.createElement('div');
-                            levelDiv.className = 'star-level absolute -top-5 left-1/2 transform -translate-x-1/2 text-yellow-400';
+                            levelDiv.className = 'star-level absolute -top-2 sm:-top-5 left-1/2 transform -translate-x-1/2 text-yellow-400 text-xs sm:text-base';
                             levelDiv.textContent = '⭐';
                             
                             // Añadir el costo
                             const costDiv = document.createElement('div');
-                            costDiv.className = 'cost-badge absolute -bottom-2 left-1/2 transform -translate-x-1/2 bg-gray-800 bg-opacity-80 rounded-full px-2 py-1 text-sm flex items-center';
+                            costDiv.className = 'cost-badge absolute -bottom-1 sm:-bottom-2 left-1/2 transform -translate-x-1/2 bg-gray-800 bg-opacity-80 rounded-full px-1 py-0.5 sm:px-2 sm:py-1 text-xs sm:text-sm flex items-center';
                             costDiv.innerHTML = `<span class="mr-1">🥮</span> ${champCost}`;
                             
                             // Añadir controles
                             const controlsDiv = document.createElement('div');
-                            controlsDiv.className = 'champion-controls absolute -top-1 left-0 right-0 opacity-0 transition-opacity flex justify-center space-x-1 z-10';
+                            controlsDiv.className = 'champion-controls absolute -top-1 sm:-top-1 left-0 right-0 opacity-0 transition-opacity flex justify-center space-x-1 z-10';
                             
                             const decreaseBtn = document.createElement('button');
-                            decreaseBtn.className = 'decrease-level bg-red-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs';
+                            decreaseBtn.className = 'decrease-level bg-red-600 text-white rounded-full w-4 h-4 sm:w-5 sm:h-5 flex items-center justify-center text-xs';
                             decreaseBtn.title = 'Disminuir nivel';
                             decreaseBtn.textContent = '-';
                             
                             const increaseBtn = document.createElement('button');
-                            increaseBtn.className = 'increase-level bg-green-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs';
+                            increaseBtn.className = 'increase-level bg-green-600 text-white rounded-full w-4 h-4 sm:w-5 sm:h-5 flex items-center justify-center text-xs';
                             increaseBtn.title = 'Aumentar nivel';
                             increaseBtn.textContent = '+';
                             
                             const removeBtn = document.createElement('button');
-                            removeBtn.className = 'remove-champion bg-gray-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs';
+                            removeBtn.className = 'remove-champion bg-gray-600 text-white rounded-full w-4 h-4 sm:w-5 sm:h-5 flex items-center justify-center text-xs';
                             removeBtn.title = 'Eliminar campeón';
                             removeBtn.textContent = '×';
                             
@@ -471,7 +525,7 @@ for (let row = 0; row < 3; row++) {
                             document.createElement('div');
                             
                         if (!itemsContainer.classList.contains('items-container')) {
-                            itemsContainer.className = 'items-container absolute -bottom-8 left-1/2 transform -translate-x-1/2 flex justify-center gap-1';
+                            itemsContainer.className = 'items-container absolute -bottom-4 sm:-bottom-8 left-1/2 transform -translate-x-1/2 flex justify-center gap-1';
                             championCard.appendChild(itemsContainer);
                         }
                         
@@ -483,13 +537,16 @@ for (let row = 0; row < 3; row++) {
                             newItemImg.src = itemImg.src;
                             newItemImg.alt = itemImg.alt;
                             newItemImg.title = itemImg.title;
-                            newItemImg.className = 'w-6 h-6 object-cover border-1 border-solid border-yellow-600 object-right';
+                            newItemImg.className = 'w-4 h-4 sm:w-6 sm:h-6 object-cover object-right border-2 border-yellow-400';
                             
                             itemsContainer.appendChild(newItemImg);
                         }
                     }
                 }
             }
+            
+            // Después de añadir el campeón, actualizar el estado visual
+            updateChampionsVisualState();
         });
     });
     
@@ -659,35 +716,35 @@ for (let row = 0; row < 3; row++) {
                 img.src = champion.icon;
                 img.alt = champion.name;
                 img.title = champion.name;
+                img.className = 'w-10 h-10 sm:w-16 sm:h-16 rounded-full object-cover object-right';
                 img.setAttribute('data-champion-id', champion.id);
-                img.className = 'w-16 h-16 rounded-full object-cover object-right';
                 
                 // Crear estrellas
                 const levelDiv = document.createElement('div');
-                levelDiv.className = 'star-level absolute -top-2 left-1/2 transform -translate-x-1/2 text-yellow-400';
+                levelDiv.className = 'star-level absolute -top-2 sm:-top-5 left-1/2 transform -translate-x-1/2 text-yellow-400 text-xs sm:text-base';
                 levelDiv.textContent = '⭐'.repeat(champion.level);
                 
                 // Crear badge de costo
                 const costDiv = document.createElement('div');
-                costDiv.className = 'cost-badge mt-1 absolute -bottom-2 left-1/2 transform -translate-x-1/2 bg-gray-800 bg-opacity-80 rounded-full px-2 py-1 text-sm flex items-center';
+                costDiv.className = 'cost-badge absolute -bottom-1 sm:-bottom-2 left-1/2 transform -translate-x-1/2 bg-gray-800 bg-opacity-80 rounded-full px-1 py-0.5 sm:px-2 sm:py-1 text-xs sm:text-sm flex items-center';
                 costDiv.innerHTML = `<span class="mr-1">🥮</span> ${champion.cost}`;
                 
                 // Crear controles
                 const controlsDiv = document.createElement('div');
-                controlsDiv.className = 'champion-controls absolute -top-1 left-0 right-0 opacity-0 transition-opacity flex justify-center space-x-1 z-10';
+                controlsDiv.className = 'champion-controls absolute -top-1 sm:-top-1 left-0 right-0 opacity-0 transition-opacity flex justify-center space-x-1 z-10';
                 
                 const decreaseBtn = document.createElement('button');
-                decreaseBtn.className = 'decrease-level bg-red-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs';
+                decreaseBtn.className = 'decrease-level bg-red-600 text-white rounded-full w-4 h-4 sm:w-5 sm:h-5 flex items-center justify-center text-xs';
                 decreaseBtn.title = 'Disminuir nivel';
                 decreaseBtn.textContent = '-';
                 
                 const increaseBtn = document.createElement('button');
-                increaseBtn.className = 'increase-level bg-green-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs';
+                increaseBtn.className = 'increase-level bg-green-600 text-white rounded-full w-4 h-4 sm:w-5 sm:h-5 flex items-center justify-center text-xs';
                 increaseBtn.title = 'Aumentar nivel';
                 increaseBtn.textContent = '+';
                 
                 const removeBtn = document.createElement('button');
-                removeBtn.className = 'remove-champion bg-gray-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs';
+                removeBtn.className = 'remove-champion bg-gray-600 text-white rounded-full w-4 h-4 sm:w-5 sm:h-5 flex items-center justify-center text-xs';
                 removeBtn.title = 'Eliminar campeón';
                 removeBtn.textContent = '×';
                 
@@ -704,7 +761,7 @@ for (let row = 0; row < 3; row++) {
                 // Agregar ítems si existen
                 if (champion.items.length > 0) {
                     const itemsContainer = document.createElement('div');
-                    itemsContainer.className = 'items-container absolute -bottom-4 left-1/2 transform -translate-x-1/2 flex justify-center gap-1';
+                    itemsContainer.className = 'items-container absolute -bottom-4 sm:-bottom-8 left-1/2 transform -translate-x-1/2 flex justify-center gap-1';
                     
                     champion.items.forEach(item => {
                         const itemImg = document.createElement('img');
@@ -712,7 +769,7 @@ for (let row = 0; row < 3; row++) {
                         itemImg.alt = item.name;
                         itemImg.title = item.name;
                         itemImg.setAttribute('data-item-id', item.id);
-                        itemImg.className = 'w-6 h-6 object-cover border-1 border-solid border-yellow-600 object-right';
+                        itemImg.className = 'w-4 h-4 sm:w-6 sm:h-6 object-cover object-right border-2 border-yellow-400';
                         
                         itemsContainer.appendChild(itemImg);
                     });
@@ -725,6 +782,9 @@ for (let row = 0; row < 3; row++) {
                 // Configurar los controles para este campeón
                 setupChampionControls(championCard);
             });
+            
+            // Actualizar el estado visual después de cargar
+            setTimeout(() => updateChampionsVisualState(), 100);
             
             showToast('Composición cargada correctamente');
         } catch (error) {
@@ -773,35 +833,35 @@ for (let row = 0; row < 3; row++) {
                     img.src = champion.icon;
                     img.alt = champion.name;
                     img.title = champion.name;
+                    img.className = 'w-10 h-10 sm:w-16 sm:h-16 object-cover object-right';
                     img.setAttribute('data-champion-id', champion.id);
-                    img.className = 'w-16 h-16 rounded-full object-cover object-right';
                     
                     // Crear estrellas
                     const levelDiv = document.createElement('div');
-                    levelDiv.className = 'star-level absolute -top-2 left-1/2 transform -translate-x-1/2 text-yellow-400';
+                    levelDiv.className = 'star-level absolute -top-2 sm:-top-5 left-1/2 transform -translate-x-1/2 text-yellow-400 text-xs sm:text-base';
                     levelDiv.textContent = '⭐'.repeat(champion.level);
                     
                     // Crear badge de costo
                     const costDiv = document.createElement('div');
-                    costDiv.className = 'cost-badge mt-1 absolute -bottom-2 left-1/2 transform -translate-x-1/2 bg-gray-800 bg-opacity-80 rounded-full px-2 py-1 text-sm flex items-center';
+                    costDiv.className = 'cost-badge absolute -bottom-1 sm:-bottom-2 left-1/2 transform -translate-x-1/2 bg-gray-800 bg-opacity-80 rounded-full px-1 py-0.5 sm:px-2 sm:py-1 text-xs sm:text-sm flex items-center';
                     costDiv.innerHTML = `<span class="mr-1">🥮</span> ${champion.cost}`;
                     
                     // Crear controles
                     const controlsDiv = document.createElement('div');
-                    controlsDiv.className = 'champion-controls absolute -top-1 left-0 right-0 opacity-0 transition-opacity flex justify-center space-x-1 z-10';
+                    controlsDiv.className = 'champion-controls absolute -top-1 sm:-top-1 left-0 right-0 opacity-0 transition-opacity flex justify-center space-x-1 z-10';
                     
                     const decreaseBtn = document.createElement('button');
-                    decreaseBtn.className = 'decrease-level bg-red-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs';
+                    decreaseBtn.className = 'decrease-level bg-red-600 text-white rounded-full w-4 h-4 sm:w-5 sm:h-5 flex items-center justify-center text-xs';
                     decreaseBtn.title = 'Disminuir nivel';
                     decreaseBtn.textContent = '-';
                     
                     const increaseBtn = document.createElement('button');
-                    increaseBtn.className = 'increase-level bg-green-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs';
+                    increaseBtn.className = 'increase-level bg-green-600 text-white rounded-full w-4 h-4 sm:w-5 sm:h-5 flex items-center justify-center text-xs';
                     increaseBtn.title = 'Aumentar nivel';
                     increaseBtn.textContent = '+';
                     
                     const removeBtn = document.createElement('button');
-                    removeBtn.className = 'remove-champion bg-gray-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs';
+                    removeBtn.className = 'remove-champion bg-gray-600 text-white rounded-full w-4 h-4 sm:w-5 sm:h-5 flex items-center justify-center text-xs';
                     removeBtn.title = 'Eliminar campeón';
                     removeBtn.textContent = '×';
                     
@@ -818,7 +878,7 @@ for (let row = 0; row < 3; row++) {
                     // Agregar ítems si existen
                     if (champion.items.length > 0) {
                         const itemsContainer = document.createElement('div');
-                        itemsContainer.className = 'items-container absolute -bottom-4 left-1/2 transform -translate-x-1/2 flex justify-center gap-1';
+                        itemsContainer.className = 'items-container absolute -bottom-4 sm:-bottom-8 left-1/2 transform -translate-x-1/2 flex justify-center gap-1';
                         
                         champion.items.forEach(item => {
                             const itemImg = document.createElement('img');
@@ -826,7 +886,7 @@ for (let row = 0; row < 3; row++) {
                             itemImg.alt = item.name;
                             itemImg.title = item.name;
                             itemImg.setAttribute('data-item-id', item.id);
-                            itemImg.className = 'w-6 h-6 object-cover border-1 border-solid border-yellow-600 object-right';
+                            itemImg.className = 'w-4 h-4 sm:w-6 sm:h-6 rounded-full object-cover object-right border-2 border-yellow-400';
                             
                             itemsContainer.appendChild(itemImg);
                         });
@@ -839,6 +899,9 @@ for (let row = 0; row < 3; row++) {
                     // Configurar los controles para este campeón
                     setupChampionControls(championCard);
                 });
+                
+                // Actualizar el estado visual después de cargar
+                setTimeout(() => updateChampionsVisualState(), 100);
                 
                 showToast('Composición importada correctamente');
                 
@@ -867,6 +930,7 @@ for (let row = 0; row < 3; row++) {
         document.querySelectorAll('.hex-cell .hex-content').forEach(cell => {
             cell.innerHTML = '';
         });
+        updateChampionsVisualState();
         showToast('Tablero limpiado correctamente');
     }
     
@@ -909,13 +973,122 @@ for (let row = 0; row < 3; row++) {
         clearBtn.addEventListener('click', clearBoard);
     }
 
-    // Cargar composición al iniciar
-    window.addEventListener('DOMContentLoaded', loadComposition);
+    // Agregar un nuevo escuchador para actualizar el estado visual cuando la página se carga completamente
+    document.addEventListener('DOMContentLoaded', function() {
+        // Cargar la composición guardada si existe
+        loadComposition();
+        // Actualizar el estado visual de los campeones
+        setTimeout(() => updateChampionsVisualState(), 200);
+    });
+
+    // Modificamos la función de los eventos de drag and drop
+    // Primero agregamos soporte para arrastrar campeones que ya están en el tablero
+    cells.forEach(cell => {
+        const hexContent = cell.querySelector('.hex-content');
+        
+        if (hexContent) {
+            // Hacer que los campeones en el tablero sean arrastrables
+            hexContent.addEventListener('mousedown', function(e) {
+                const championCard = hexContent.querySelector('.champion-card');
+                if (championCard) {
+                    // Solo iniciar drag si se hace clic directamente en la imagen del campeón
+                    const isOnImg = e.target && (e.target as HTMLElement).tagName === 'IMG';
+                    const isOnCard = championCard.contains(e.target as Node);
+                    
+                    // No permitir drag si se hizo clic en los controles
+                    const isOnControls = e.target && (
+                        (e.target as HTMLElement).closest('.increase-level') || 
+                        (e.target as HTMLElement).closest('.decrease-level') || 
+                        (e.target as HTMLElement).closest('.remove-champion')
+                    );
+                    
+                    if (isOnCard && !isOnControls) {
+                        championCard.setAttribute('draggable', 'true');
+                        
+                        // Configurar listeners de drag para este campeón
+                        championCard.addEventListener('dragstart', function(e: Event) {
+                            const dragEvent = e as DragEvent;
+                            if (dragEvent.dataTransfer) {
+                                // Marcamos que este campeón viene del tablero
+                                dragEvent.dataTransfer.setData('text/plain', 'board-champion');
+                                draggedElement = championCard;
+                            }
+                        }, { once: true });
+                    }
+                }
+            });
+            
+            // Al soltar el botón del mouse, deshabilitar el draggable
+            hexContent.addEventListener('mouseup', function() {
+                const championCard = hexContent.querySelector('.champion-card');
+                if (championCard) {
+                    championCard.setAttribute('draggable', 'false');
+                }
+            });
+        }
+    });
+
+    // Modificar el evento drop para manejar campeones que vienen del tablero
+    cells.forEach(cell => {
+        const hexContent = cell.querySelector('.hex-content');
+        
+        if (hexContent) {
+            hexContent.addEventListener('dragover', function(e: Event) {
+                e.preventDefault();
+                const dragEvent = e as DragEvent;
+                if (dragEvent.dataTransfer) {
+                    dragEvent.dataTransfer.dropEffect = 'move';
+                }
+            });
+            
+            hexContent.addEventListener('drop', function(e: Event) {
+                e.preventDefault();
+                const dragEvent = e as DragEvent;
+                
+                if (!dragEvent.dataTransfer) return;
+                
+                // Obtener el tipo de elemento arrastrado
+                const data = dragEvent.dataTransfer.getData('text/plain');
+                
+                // Si es un campeón del tablero
+                if (data === 'board-champion' && draggedElement) {
+                    // Verificar si la celda destino ya tiene un campeón
+                    const existingChampion = hexContent.querySelector('.champion-card');
+                    
+                    // Si la celda destino está vacía
+                    if (!existingChampion) {
+                        // Mover el campeón a la nueva celda
+                        const originCell = draggedElement.closest('.hex-content');
+                        if (originCell && originCell !== hexContent) {
+                            hexContent.appendChild(draggedElement);
+                            originCell.innerHTML = '';
+                        }
+                    } 
+                    // Si la celda destino ya tiene un campeón, intercambiar posiciones
+                    else if (existingChampion && draggedElement !== existingChampion) {
+                        const originCell = draggedElement.closest('.hex-content');
+                        if (originCell) {
+                            // Intercambiar los campeones
+                            originCell.appendChild(existingChampion);
+                            hexContent.appendChild(draggedElement);
+                        }
+                    }
+                    
+                    // Restablecer el elemento arrastrado
+                    draggedElement = null;
+                }
+                // Código existente para otros tipos de elementos
+                else if (data && draggedElement) {
+                    // ... código existente para manejar campeones nuevos e items
+                }
+            });
+        }
+    });
 </script>
 
 <style>
     .board-container {
-        padding: 30px;
+        padding: 15px;
         background: rgba(0, 0, 0, 0.3);
         border-radius: 12px;
         margin-bottom: 20px;
@@ -925,17 +1098,20 @@ for (let row = 0; row < 3; row++) {
 
     .board-grid {
         display: grid;
-        grid-template-rows: repeat(3, 120px);
+        grid-template-rows: repeat(3, 90px);
         grid-template-columns: repeat(7, 1fr);
-        gap: 15px 0px;
+        gap: 10px 5px;
         position: relative;
+        max-width: 90%;
+        margin: 0 auto;
     }
 
     .hex-cell {
-        width: 80%;
-        height: 110px;
+        width: 90%;
+        height: 85px;
         position: relative;
-        filter: drop-shadow(0px 0px 1px white);
+        margin: 0 auto;
+        filter: drop-shadow(0px 0px 0px rgba(255, 255, 255, 1));
     }
 
     /* Fondo del hexágono */
@@ -971,7 +1147,7 @@ for (let row = 0; row < 3; row++) {
     }
     
     .hex-cell:hover::after {
-        box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.5);
+        box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.7);
     }
 
     .hex-content {
@@ -989,7 +1165,7 @@ for (let row = 0; row < 3; row++) {
 
     /* Ajustar posición de las filas para el patrón escalonado */
     .board-grid > .hex-cell:nth-child(n+8):nth-child(-n+14) {
-        transform: translateX(calc(50% - 15px));
+        transform: translateX(50%);
     }
 
     .champion-card {
@@ -1000,7 +1176,7 @@ for (let row = 0; row < 3; row++) {
         align-items: center;
         justify-content: center;
         background: transparent;
-        padding: 4px;
+        padding: 2px;
         border-radius: 8px;
     }
     
@@ -1014,24 +1190,24 @@ for (let row = 0; row < 3; row++) {
     
     .cost-badge {
         z-index: 5;
-        font-size: 0.75rem;
+        font-size: 0.7rem;
         box-shadow: 0 0 3px rgba(0, 0, 0, 0.5);
     }
     
     .star-level {
         text-shadow: 0 0 3px rgba(0, 0, 0, 0.8);
-        font-size: 0.8rem;
+        font-size: 0.7rem;
     }
     
     .items-container {
         z-index: 4;
     }
     
-    .item-card {
+    .item-card, .champion-card-grid {
         transition: transform 0.2s;
     }
     
-    .item-card:hover {
+    .item-card:hover, .champion-card-grid:hover {
         transform: scale(1.05);
     }
 
@@ -1044,42 +1220,88 @@ for (let row = 0; row < 3; row++) {
         box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.7);
     }
 
-    .champion-card .text-center {
-        background: rgba(26, 28, 44, 0.8);
-        padding: 8px;
-        border-radius: 6px;
-        width: 100%;
-    }
-
-    @media (max-width: 1024px) {
-        .board-grid {
-            grid-template-rows: repeat(3, 100px);
-            gap: 10px 25px;
-        }
-        
-        .hex-cell {
-            height: 90px;
-        }
-    }
-
-    @media (max-width: 768px) {
-        .board-grid {
-            grid-template-rows: repeat(3, 80px);
-            gap: 8px 18px;
-        }
-        
-        .hex-cell {
-            height: 70px;
-        }
-        
-        .champion-card .text-center {
-            padding: 4px;
-            font-size: 0.8rem;
-        }
-    }
-
     /* Estilos para el toast */
     .transition-opacity {
         transition: opacity 0.3s ease;
     }
-</style> 
+    
+    /* Media queries para tablets */
+    @media (min-width: 768px) {
+        .board-container {
+            padding: 20px;
+        }
+        
+        .board-grid {
+            grid-template-rows: repeat(3, 100px);
+            gap: 15px 10px;
+        }
+        
+        .hex-cell {
+            width: 95%;
+            height: 95px;
+        }
+        
+        /* Ajustar posición de las filas para el patrón escalonado en tablets */
+        .board-grid > .hex-cell:nth-child(n+8):nth-child(-n+14) {
+            transform: translateX(50%);
+        }
+        
+        .cost-badge {
+            font-size: 0.75rem;
+        }
+        
+        .star-level {
+            font-size: 0.8rem;
+        }
+    }
+    
+    /* Media queries para desktop */
+    @media (min-width: 1024px) {
+        .board-container {
+            padding: 30px;
+        }
+        
+        .board-grid {
+            grid-template-rows: repeat(3, 120px);
+            gap: 20px 15px;
+        }
+        
+        .hex-cell {
+            width: 100%;
+            height: 115px;
+        }
+        
+        /* Ajustar posición de las filas para el patrón escalonado en desktop */
+        .board-grid > .hex-cell:nth-child(n+8):nth-child(-n+14) {
+            transform: translateX(50%);
+        }
+    }
+    
+    /* Ajustes para pantallas pequeñas */
+    @media (max-width: 380px) {
+        .board-grid {
+            grid-template-rows: repeat(3, 70px);
+            gap: 8px 4px;
+        }
+        
+        .hex-cell {
+            width: 85%;
+            height: 65px;
+        }
+        
+        .cost-badge {
+            font-size: 0.6rem;
+        }
+        
+        .star-level {
+            font-size: 0.6rem;
+        }
+    }
+</style>
+
+<footer class="mt-8 py-4 border-t border-gray-800 text-center text-xs sm:text-sm text-gray-400">
+    <h1 class="underline">Descargo de responsabilidad</h1>
+    <p>TFT Compositor no está asociado por Riot Games y no refleja los puntos de vista ni las opiniones de Riot Games o de cualquier persona oficialmente involucrada en la producción o administración de Teamfight Tactics.</p>
+    <p class="mt-2">Teamfight Tactics y Riot Games son marcas comerciales o marcas registradas de Riot Games, Inc.</p>
+    <p class="mt-2">© {new Date().getFullYear()} Camiicodes. Todos los derechos reservados.</p>
+</footer> 
