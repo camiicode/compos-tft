@@ -19,6 +19,18 @@ for (let row = 0; row < 3; row++) {
 ---
 
 <div class="max-w-screen-xl mx-auto px-4">
+    <div class="flex justify-between items-center mb-4">
+        <h1 class="text-2xl font-bold">TFT Compositor</h1>
+        <div class="flex space-x-2">
+            <button id="save-comp" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded">
+                Guardar 💾
+            </button>
+            <button id="clear-comp" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded">
+                Limpiar 🗑️
+            </button>
+        </div>
+    </div>
+    
     <div class="board-container">
         <div class="board-grid" id="board">
             {board.map((cell) => (
@@ -501,6 +513,217 @@ for (let row = 0; row < 3; row++) {
             }
         }
     });
+
+    // Estructura para almacenar la composición actual
+    interface StoredChampion {
+        id: string;
+        name: string;
+        icon: string;
+        cost: number;
+        level: number;
+        position: { row: number; col: number };
+        items: { 
+            id: string;
+            name: string;
+            icon: string;
+        }[];
+    }
+
+    // Función para guardar la composición actual
+    function saveComposition() {
+        const composition: StoredChampion[] = [];
+        const championCards = document.querySelectorAll('.hex-cell .champion-card');
+        
+        championCards.forEach(card => {
+            const cell = card.closest('.hex-cell');
+            if (!cell) return;
+            
+            const row = parseInt(cell.getAttribute('data-row') || '0');
+            const col = parseInt(cell.getAttribute('data-col') || '0');
+            const img = card.querySelector('img');
+            const starLevel = card.querySelector('.star-level');
+            const costBadge = card.querySelector('.cost-badge');
+            const itemElements = card.querySelectorAll('.items-container img');
+            
+            if (!img) return;
+            
+            // Determinar el nivel por la cantidad de estrellas
+            const starsText = starLevel?.textContent || '⭐';
+            const level = starsText.length;
+            
+            // Extraer el costo del badge
+            const costText = costBadge?.textContent?.replace('🥮', '').trim() || '1';
+            const cost = parseInt(costText);
+            
+            // Extraer los ítems
+            const items = Array.from(itemElements).map(item => {
+                return {
+                    id: item.getAttribute('data-item-id') || '',
+                    name: item.getAttribute('title') || '',
+                    icon: item.getAttribute('src') || ''
+                };
+            });
+            
+            composition.push({
+                id: img.getAttribute('data-champion-id') || '',
+                name: img.getAttribute('title') || '',
+                icon: img.getAttribute('src') || '',
+                cost,
+                level,
+                position: { row, col },
+                items
+            });
+        });
+        
+        // Guardar en localStorage
+        localStorage.setItem('tft-composition', JSON.stringify(composition));
+        
+        // Mostrar feedback al usuario
+        showToast('Composición guardada correctamente');
+    }
+    
+    // Función para cargar la composición guardada
+    function loadComposition() {
+        const storedComp = localStorage.getItem('tft-composition');
+        if (!storedComp) return;
+        
+        try {
+            // Limpiar el tablero primero
+            document.querySelectorAll('.hex-cell .hex-content').forEach(cell => {
+                cell.innerHTML = '';
+            });
+            
+            const composition: StoredChampion[] = JSON.parse(storedComp);
+            
+            composition.forEach(champion => {
+                const { row, col } = champion.position;
+                const cell = document.querySelector(`.hex-cell[data-row="${row}"][data-col="${col}"]`);
+                
+                if (!cell) return;
+                
+                const hexContent = cell.querySelector('.hex-content');
+                if (!hexContent) return;
+                
+                // Crear el campeón
+                const championCard = document.createElement('div');
+                championCard.className = 'champion-card relative';
+                
+                // Crear la imagen del campeón
+                const img = document.createElement('img');
+                img.src = champion.icon;
+                img.alt = champion.name;
+                img.title = champion.name;
+                img.setAttribute('data-champion-id', champion.id);
+                img.className = 'w-16 h-16 rounded-full object-cover object-right';
+                
+                // Crear estrellas
+                const levelDiv = document.createElement('div');
+                levelDiv.className = 'star-level absolute -top-2 left-1/2 transform -translate-x-1/2 text-yellow-400';
+                levelDiv.textContent = '⭐'.repeat(champion.level);
+                
+                // Crear badge de costo
+                const costDiv = document.createElement('div');
+                costDiv.className = 'cost-badge mt-1 absolute -bottom-2 left-1/2 transform -translate-x-1/2 bg-gray-800 bg-opacity-80 rounded-full px-2 py-1 text-sm flex items-center';
+                costDiv.innerHTML = `<span class="mr-1">🥮</span> ${champion.cost}`;
+                
+                // Crear controles
+                const controlsDiv = document.createElement('div');
+                controlsDiv.className = 'champion-controls absolute -top-1 left-0 right-0 opacity-0 transition-opacity flex justify-center space-x-1 z-10';
+                
+                const decreaseBtn = document.createElement('button');
+                decreaseBtn.className = 'decrease-level bg-red-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs';
+                decreaseBtn.title = 'Disminuir nivel';
+                decreaseBtn.textContent = '-';
+                
+                const increaseBtn = document.createElement('button');
+                increaseBtn.className = 'increase-level bg-green-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs';
+                increaseBtn.title = 'Aumentar nivel';
+                increaseBtn.textContent = '+';
+                
+                const removeBtn = document.createElement('button');
+                removeBtn.className = 'remove-champion bg-gray-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs';
+                removeBtn.title = 'Eliminar campeón';
+                removeBtn.textContent = '×';
+                
+                controlsDiv.appendChild(decreaseBtn);
+                controlsDiv.appendChild(increaseBtn);
+                controlsDiv.appendChild(removeBtn);
+                
+                // Agregar todo al campeón
+                championCard.appendChild(img);
+                championCard.appendChild(levelDiv);
+                championCard.appendChild(costDiv);
+                championCard.appendChild(controlsDiv);
+                
+                // Agregar ítems si existen
+                if (champion.items.length > 0) {
+                    const itemsContainer = document.createElement('div');
+                    itemsContainer.className = 'items-container absolute -bottom-4 left-1/2 transform -translate-x-1/2 flex justify-center gap-1';
+                    
+                    champion.items.forEach(item => {
+                        const itemImg = document.createElement('img');
+                        itemImg.src = item.icon;
+                        itemImg.alt = item.name;
+                        itemImg.title = item.name;
+                        itemImg.setAttribute('data-item-id', item.id);
+                        itemImg.className = 'w-6 h-6 object-cover border-1 border-solid border-yellow-600 object-right';
+                        
+                        itemsContainer.appendChild(itemImg);
+                    });
+                    
+                    championCard.appendChild(itemsContainer);
+                }
+                
+                hexContent.appendChild(championCard);
+                
+                // Configurar los controles para este campeón
+                setupChampionControls(championCard);
+            });
+            
+            showToast('Composición cargada correctamente');
+        } catch (error) {
+            console.error('Error cargando la composición:', error);
+            showToast('Error al cargar la composición', true);
+        }
+    }
+    
+    // Función para limpiar todo el tablero
+    function clearBoard() {
+        document.querySelectorAll('.hex-cell .hex-content').forEach(cell => {
+            cell.innerHTML = '';
+        });
+        showToast('Tablero limpiado correctamente');
+    }
+    
+    // Función para mostrar un toast de retroalimentación
+    function showToast(message: string, isError = false) {
+        const toast = document.createElement('div');
+        toast.className = `fixed bottom-4 right-4 ${isError ? 'bg-red-500' : 'bg-green-500'} text-white px-4 py-2 rounded shadow-lg z-50 transition-opacity`;
+        toast.textContent = message;
+        document.body.appendChild(toast);
+        
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            setTimeout(() => {
+                document.body.removeChild(toast);
+            }, 300);
+        }, 3000);
+    }
+    
+    // Evento para guardar la composición
+    const saveBtn = document.getElementById('save-comp');
+    if (saveBtn) {
+        saveBtn.addEventListener('click', saveComposition);
+    }
+    
+    // Evento para limpiar el tablero
+    const clearBtn = document.getElementById('clear-comp');
+    if (clearBtn) {
+        clearBtn.addEventListener('click', clearBoard);
+    }
+    
+    // Cargar composición al iniciar
+    window.addEventListener('DOMContentLoaded', loadComposition);
 </script>
 
 <style>
@@ -666,5 +889,10 @@ for (let row = 0; row < 3; row++) {
             padding: 4px;
             font-size: 0.8rem;
         }
+    }
+
+    /* Estilos para el toast */
+    .transition-opacity {
+        transition: opacity 0.3s ease;
     }
 </style> 
