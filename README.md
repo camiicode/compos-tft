@@ -65,5 +65,5 @@ Tu archivo `.env` está excluido del repositorio (.gitignore). Nunca subas tu cl
 
 # 📜 Licencia
 
-MIT License © 2025 - Camiicode
+[LICENSE](./LICENSE)
 
