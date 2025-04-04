@@ -18,124 +18,156 @@ for (let row = 0; row < 3; row++) {
 }
 ---
 
-<div class="board-container">
-    <div class="board-grid" id="board">
-        {board.map((cell) => (
-            <div
-                class="hex-cell"
-                data-cell-id={cell.id}
-                data-row={cell.position.row}
-                data-col={cell.position.col}
-            >
-                <div class="hex-content">
-                    {cell.champion && (
-                        <div class="champion-card relative">
-                            <img 
-                                src={cell.champion.icon} 
-                                alt={cell.champion.name} 
-                                title={cell.champion.name}
-                                class="w-16 h-16 rounded-full object-cover"
-                            />
-                            <div class="absolute -top-2 -right-2 bg-yellow-500 text-black rounded-full w-6 h-6 flex items-center justify-center">
-                                {cell.champion.level || 1}
-                            </div>
-                            {cell.champion.items && cell.champion.items.length > 0 && (
-                                <div class="absolute bottom-0 left-0 right-0 flex justify-center gap-1">
-                                    {cell.champion.items.map((item) => (
-                                        <img 
-                                            src={item.icon} 
-                                            alt={item.name} 
-                                            title={item.name}
-                                            class="w-6 h-6 rounded-full object-cover"
-                                        />
-                                    ))}
+<div class="max-w-screen-xl mx-auto px-4">
+    <div class="board-container">
+        <div class="board-grid" id="board">
+            {board.map((cell) => (
+                <div
+                    class="hex-cell"
+                    data-cell-id={cell.id}
+                    data-row={cell.position.row}
+                    data-col={cell.position.col}
+                >
+                    <div class="hex-content">
+                        {cell.champion && (
+                            <div class="champion-card relative">
+                                <img 
+                                    src={cell.champion.icon} 
+                                    alt={cell.champion.name} 
+                                    title={cell.champion.name}
+                                    class="w-16 h-16 rounded-full object-cover object-right"
+                                />
+                                <div class="star-level absolute -top-2 left-1/2 transform -translate-x-1/2 text-yellow-400">
+                                    {'⭐'.repeat(cell.champion.level || 1)}
                                 </div>
-                            )}
-                        </div>
-                    )}
-                </div>
-            </div>
-        ))}
-    </div>
-</div>
-
-<div class="champions-container mt-4">
-    <h2 class="text-xl font-bold mb-2">Campeones Disponibles</h2>
-    <div class="mb-4">
-        <input 
-            type="text" 
-            id="champion-search" 
-            placeholder="Buscar campeón..." 
-            class="w-full p-2 bg-gray-800 rounded-lg text-white"
-        />
-    </div>
-    <div class="grid grid-cols-4 md:grid-cols-5 lg:grid-cols-10 gap-2" id="champions-list">
-        {champions.map((champion, index) => (
-            <div
-                class={`champion-card-grid bg-gray-800 rounded-lg p-2 cursor-move ${index >= 20 ? 'hidden initial-hidden' : ''}`}
-                draggable="true"
-                data-champion-id={champion.id}
-            >
-                <div class="flex flex-col items-center h-full relative">
-                    <img 
-                        src={champion.icon} 
-                        alt={champion.name} 
-                        title={champion.name}
-                        class="w-16 h-16 rounded-full object-cover"
-                    />
-                    <div class="absolute top-0 right-0 bg-yellow-500 text-black rounded-full w-6 h-6 flex items-center justify-center" title="Costo">
-                        {champion.cost}
+                                
+                                <div class="champion-controls absolute -top-1 left-0 right-0 opacity-0 transition-opacity flex justify-center space-x-1 z-10">
+                                    <button class="decrease-level bg-red-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs" title="Disminuir nivel">
+                                        -
+                                    </button>
+                                    <button class="increase-level bg-green-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs" title="Aumentar nivel">
+                                        +
+                                    </button>
+                                    <button class="remove-champion bg-gray-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs" title="Eliminar campeón">
+                                        ×
+                                    </button>
+                                </div>
+                                
+                                <div class="cost-badge mt-1 absolute -bottom-2 left-1/2 transform -translate-x-1/2 bg-gray-800 bg-opacity-80 rounded-full px-2 py-1 text-sm flex items-center">
+                                    <span class="mr-1">🥮</span> {cell.champion.cost}
+                                </div>
+                                
+                                {cell.champion.items && cell.champion.items.length > 0 && (
+                                    <div class="items-container absolute -bottom-4 left-1/2 transform -translate-x-1/2 flex justify-center gap-1">
+                                        {cell.champion.items.map((item) => (
+                                            <img 
+                                                src={item.icon} 
+                                                alt={item.name} 
+                                                title={item.name}
+                                                class="w-6 h-6 object-cover border-1 border-solid border-yellow-600 object-right"
+                                            />
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        )}
                     </div>
                 </div>
-            </div>
-        ))}
+            ))}
+        </div>
     </div>
-    <div class="text-center mt-2">
-        <button id="show-more-champions" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">
-            Mostrar más campeones
-        </button>
-    </div>
-</div>
 
-<div class="items-container mt-4">
-    <h2 class="text-xl font-bold mb-2">Items Disponibles</h2>
-    <div class="mb-4">
-        <input 
-            type="text" 
-            id="item-search" 
-            placeholder="Buscar item..." 
-            class="w-full p-2 bg-gray-800 rounded-lg text-white"
-        />
-    </div>
-    <div class="grid grid-cols-4 md:grid-cols-5 lg:grid-cols-10 gap-2" id="items-list">
-        {items.map((item, index) => (
-            <div
-                class={`item-card bg-gray-800 rounded-lg p-2 cursor-move ${index >= 20 ? 'hidden initial-hidden' : ''}`}
-                draggable="true"
-                data-item-id={item.id}
-            >
-                <div class="flex flex-col items-center h-full relative">
-                    <img 
-                        src={item.icon} 
-                        alt={item.name} 
-                        title={item.name}
-                        class="w-16 h-16 rounded-full object-cover"
-                    />
-                    <p class="text-xs mt-1 text-center text-gray-300">{item.name}</p>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+        <div class="champions-container">
+            <div class="flex justify-between items-center mb-2">
+                <h2 class="text-xl font-bold">Campeones Disponibles</h2>
+                <div class="flex space-x-2">
+                    <button id="show-more-champions" class="bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded text-sm">
+                        Ver más
+                    </button>
+                    <button id="hide-champions" class="bg-gray-600 hover:bg-gray-700 text-white px-2 py-1 rounded text-sm">
+                        Ver menos
+                    </button>
                 </div>
             </div>
-        ))}
-    </div>
-    <div class="text-center mt-2">
-        <button id="show-more-items" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">
-            Mostrar más items
-        </button>
+            <div class="mb-4">
+                <input 
+                    type="text" 
+                    id="champion-search" 
+                    placeholder="Buscar campeón..." 
+                    class="w-full p-2 bg-gray-800 rounded-lg text-white"
+                />
+            </div>
+            <div class="grid grid-cols-4 md:grid-cols-5 gap-2" id="champions-list">
+                {champions.map((champion, index) => (
+                    <div
+                        class={`champion-card-grid bg-gray-800 rounded-lg p-2 cursor-move ${index >= 15 ? 'hidden initial-hidden' : ''}`}
+                        draggable="true"
+                        data-champion-id={champion.id}
+                    >
+                        <div class="flex flex-col items-center h-full relative">
+                            <img 
+                                src={champion.icon} 
+                                alt={champion.name} 
+                                title={champion.name}
+                                class="w-16 h-16 rounded-full object-cover object-right"
+                            />
+                            <div class="absolute top-0 right-0 bg-yellow-500 text-black rounded-full w-6 h-6 flex items-center justify-center" title="Costo">
+                                {champion.cost}
+                            </div>
+                        </div>
+                    </div>
+                ))}
+            </div>
+        </div>
+
+        <div class="items-container">
+            <div class="flex justify-between items-center mb-2">
+                <h2 class="text-xl font-bold">Items Disponibles</h2>
+                <div class="flex space-x-2">
+                    <button id="show-more-items" class="bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded text-sm">
+                        Ver más
+                    </button>
+                    <button id="hide-items" class="bg-gray-600 hover:bg-gray-700 text-white px-2 py-1 rounded text-sm">
+                        Ver menos
+                    </button>
+                </div>
+            </div>
+            <div class="mb-4">
+                <input 
+                    type="text" 
+                    id="item-search" 
+                    placeholder="Buscar item..." 
+                    class="w-full p-2 bg-gray-800 rounded-lg text-white"
+                />
+            </div>
+            <div class="grid grid-cols-4 md:grid-cols-5 gap-2" id="items-list">
+                {items.map((item, index) => (
+                    <div
+                        class={`item-card bg-gray-800 rounded-lg p-2 cursor-move ${index >= 10 ? 'hidden initial-hidden' : ''}`}
+                        draggable="true"
+                        data-item-id={item.id}
+                    >
+                        <div class="flex flex-col items-center h-full relative">
+                            <img 
+                                src={item.icon} 
+                                alt={item.name} 
+                                title={item.name}
+                                class="w-16 h-16 rounded-full object-cover object-right"
+                            />
+                            <p class="text-xs mt-1 text-center text-gray-300">{item.name}</p>
+                        </div>
+                    </div>
+                ))}
+            </div>
+        </div>
     </div>
 </div>
 
 <script>
     // Funcionalidad para mostrar más campeones
     const showMoreChampionsBtn = document.getElementById('show-more-champions');
+    const hideChampionsBtn = document.getElementById('hide-champions');
     const hiddenChampions = document.querySelectorAll('#champions-list .initial-hidden');
     
     if (showMoreChampionsBtn) {
@@ -144,11 +176,26 @@ for (let row = 0; row < 3; row++) {
                 card.classList.remove('hidden');
             });
             showMoreChampionsBtn.style.display = 'none';
+            if (hideChampionsBtn) {
+                hideChampionsBtn.style.display = '';
+            }
+        });
+    }
+    
+    if (hideChampionsBtn) {
+        hideChampionsBtn.addEventListener('click', function() {
+            hiddenChampions.forEach(card => {
+                card.classList.add('hidden');
+            });
+            if (showMoreChampionsBtn) {
+                showMoreChampionsBtn.style.display = '';
+            }
         });
     }
     
     // Funcionalidad para mostrar más items
     const showMoreItemsBtn = document.getElementById('show-more-items');
+    const hideItemsBtn = document.getElementById('hide-items');
     const hiddenItems = document.querySelectorAll('#items-list .initial-hidden');
     
     if (showMoreItemsBtn) {
@@ -157,6 +204,20 @@ for (let row = 0; row < 3; row++) {
                 card.classList.remove('hidden');
             });
             showMoreItemsBtn.style.display = 'none';
+            if (hideItemsBtn) {
+                hideItemsBtn.style.display = '';
+            }
+        });
+    }
+    
+    if (hideItemsBtn) {
+        hideItemsBtn.addEventListener('click', function() {
+            hiddenItems.forEach(card => {
+                card.classList.add('hidden');
+            });
+            if (showMoreItemsBtn) {
+                showMoreItemsBtn.style.display = '';
+            }
         });
     }
 
@@ -186,13 +247,17 @@ for (let row = 0; row < 3; row++) {
             }
         });
         
-        // Si hay búsqueda, ocultar el botón "Mostrar más"
+        // Si hay búsqueda, ocultar los botones de mostrar/ocultar
         const showMoreBtn = listElement.id === 'champions-list' ? 
             document.getElementById('show-more-champions') : 
             document.getElementById('show-more-items');
+        const hideBtn = listElement.id === 'champions-list' ? 
+            document.getElementById('hide-champions') : 
+            document.getElementById('hide-items');
             
-        if (showMoreBtn) {
+        if (showMoreBtn && hideBtn) {
             showMoreBtn.style.display = searchTerm ? 'none' : '';
+            hideBtn.style.display = searchTerm ? 'none' : '';
         }
     }
     
@@ -241,6 +306,46 @@ for (let row = 0; row < 3; row++) {
         });
     });
 
+    // Función para gestionar los controles del campeón
+    function setupChampionControls(championCard: Element) {
+        const increaseBtn = championCard.querySelector('.increase-level');
+        const decreaseBtn = championCard.querySelector('.decrease-level');
+        const removeBtn = championCard.querySelector('.remove-champion');
+        const levelElement = championCard.querySelector('.star-level');
+        
+        if (increaseBtn && levelElement) {
+            increaseBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const starsText = levelElement.textContent || '⭐';
+                const currentLevel = starsText.length;
+                if (currentLevel < 3) {
+                    levelElement.textContent = '⭐'.repeat(currentLevel + 1);
+                }
+            });
+        }
+        
+        if (decreaseBtn && levelElement) {
+            decreaseBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const starsText = levelElement.textContent || '⭐';
+                const currentLevel = starsText.length;
+                if (currentLevel > 1) {
+                    levelElement.textContent = '⭐'.repeat(currentLevel - 1);
+                }
+            });
+        }
+        
+        if (removeBtn) {
+            removeBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const hexContent = championCard.closest('.hex-content');
+                if (hexContent) {
+                    hexContent.innerHTML = '';
+                }
+            });
+        }
+    }
+
     // Actualizar los eventos de las celdas
     cells.forEach(cell => {
         cell.addEventListener('dragover', function(e: Event) {
@@ -267,17 +372,18 @@ for (let row = 0; row < 3; row++) {
                 // Si ya hay un campeón en la celda, incrementar su nivel
                 const existingChampion = cell.querySelector('.champion-card');
                 if (existingChampion) {
-                    const levelElement = existingChampion.querySelector('.bg-yellow-500');
+                    const levelElement = existingChampion.querySelector('.star-level');
                     if (levelElement) {
-                        const currentLevel = parseInt(levelElement.textContent || '1');
+                        const starsText = levelElement.textContent || '⭐';
+                        const currentLevel = starsText.length;
                         if (currentLevel < 3) {
-                            levelElement.textContent = (currentLevel + 1).toString();
+                            levelElement.textContent = '⭐'.repeat(currentLevel + 1);
                         }
                     }
                 } else {
                     // Si la celda está vacía, crear una nueva tarjeta de campeón
                     const champImg = championCard.querySelector('img');
-                    const champCost = championCard.querySelector('.bg-yellow-500')?.textContent;
+                    const champCost = championCard.querySelector('.bg-yellow-500')?.textContent || '1';
                     
                     if (champImg) {
                         const hexContent = cell.querySelector('.hex-content');
@@ -290,16 +396,49 @@ for (let row = 0; row < 3; row++) {
                             newImg.src = champImg.src;
                             newImg.alt = champImg.alt;
                             newImg.title = champImg.title;
-                            newImg.className = 'w-16 h-16 rounded-full object-cover';
+                            newImg.className = 'w-16 h-16 rounded-full object-cover object-right';
                             
-                            // Añadir el nivel
+                            // Añadir las estrellas
                             const levelDiv = document.createElement('div');
-                            levelDiv.className = 'absolute -top-2 -right-2 bg-yellow-500 text-black rounded-full w-6 h-6 flex items-center justify-center';
-                            levelDiv.textContent = '1';
+                            levelDiv.className = 'star-level absolute -top-5 left-1/2 transform -translate-x-1/2 text-yellow-400';
+                            levelDiv.textContent = '⭐';
+                            
+                            // Añadir el costo
+                            const costDiv = document.createElement('div');
+                            costDiv.className = 'cost-badge absolute -bottom-2 left-1/2 transform -translate-x-1/2 bg-gray-800 bg-opacity-80 rounded-full px-2 py-1 text-sm flex items-center';
+                            costDiv.innerHTML = `<span class="mr-1">🥮</span> ${champCost}`;
+                            
+                            // Añadir controles
+                            const controlsDiv = document.createElement('div');
+                            controlsDiv.className = 'champion-controls absolute -top-1 left-0 right-0 opacity-0 transition-opacity flex justify-center space-x-1 z-10';
+                            
+                            const decreaseBtn = document.createElement('button');
+                            decreaseBtn.className = 'decrease-level bg-red-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs';
+                            decreaseBtn.title = 'Disminuir nivel';
+                            decreaseBtn.textContent = '-';
+                            
+                            const increaseBtn = document.createElement('button');
+                            increaseBtn.className = 'increase-level bg-green-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs';
+                            increaseBtn.title = 'Aumentar nivel';
+                            increaseBtn.textContent = '+';
+                            
+                            const removeBtn = document.createElement('button');
+                            removeBtn.className = 'remove-champion bg-gray-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs';
+                            removeBtn.title = 'Eliminar campeón';
+                            removeBtn.textContent = '×';
+                            
+                            controlsDiv.appendChild(decreaseBtn);
+                            controlsDiv.appendChild(increaseBtn);
+                            controlsDiv.appendChild(removeBtn);
                             
                             newChampion.appendChild(newImg);
                             newChampion.appendChild(levelDiv);
+                            newChampion.appendChild(costDiv);
+                            newChampion.appendChild(controlsDiv);
                             hexContent.appendChild(newChampion);
+                            
+                            // Configurar los controles del nuevo campeón
+                            setupChampionControls(newChampion);
                         }
                     }
                 }
@@ -309,30 +448,58 @@ for (let row = 0; row < 3; row++) {
                 if (championCard) {
                     const itemImg = itemCard.querySelector('img');
                     if (itemImg) {
-                        const itemsContainer = championCard.querySelector('.flex.justify-center.gap-1') || 
+                        const itemsContainer = championCard.querySelector('.items-container') || 
                             document.createElement('div');
                             
-                        if (!itemsContainer.classList.contains('flex')) {
-                            itemsContainer.classList.add('flex', 'justify-center', 'gap-1');
-                            (itemsContainer as HTMLElement).style.position = 'absolute';
-                            (itemsContainer as HTMLElement).style.bottom = '0';
-                            (itemsContainer as HTMLElement).style.left = '0';
-                            (itemsContainer as HTMLElement).style.right = '0';
+                        if (!itemsContainer.classList.contains('items-container')) {
+                            itemsContainer.className = 'items-container absolute -bottom-8 left-1/2 transform -translate-x-1/2 flex justify-center gap-1';
                             championCard.appendChild(itemsContainer);
                         }
                         
-                        // Copiar la imagen del item
-                        const newItemImg = document.createElement('img');
-                        newItemImg.src = itemImg.src;
-                        newItemImg.alt = itemImg.alt;
-                        newItemImg.title = itemImg.title;
-                        newItemImg.className = 'w-6 h-6 rounded-full object-cover';
-                        
-                        itemsContainer.appendChild(newItemImg);
+                        // Limitar a 3 objetos máximo
+                        const currentItems = itemsContainer.querySelectorAll('img');
+                        if (currentItems.length < 3) {
+                            // Copiar la imagen del item
+                            const newItemImg = document.createElement('img');
+                            newItemImg.src = itemImg.src;
+                            newItemImg.alt = itemImg.alt;
+                            newItemImg.title = itemImg.title;
+                            newItemImg.className = 'w-6 h-6 object-cover border-1 border-solid border-yellow-600 object-right';
+                            
+                            itemsContainer.appendChild(newItemImg);
+                        }
                     }
                 }
             }
         });
+    });
+    
+    // Configurar eventos para los botones de control del campeón para cada campeón existente
+    document.querySelectorAll('.champion-card').forEach(championCard => {
+        setupChampionControls(championCard);
+    });
+    
+    // Mostrar controles al hacer hover
+    document.addEventListener('mouseover', function(e) {
+        const target = e.target as Element;
+        const championCard = target.closest('.champion-card');
+        if (championCard) {
+            const controls = championCard.querySelector('.champion-controls');
+            if (controls) {
+                (controls as HTMLElement).style.opacity = '1';
+            }
+        }
+    });
+    
+    document.addEventListener('mouseout', function(e) {
+        const target = e.target as Element;
+        const championCard = target.closest('.champion-card');
+        if (championCard) {
+            const controls = championCard.querySelector('.champion-controls');
+            if (controls) {
+                (controls as HTMLElement).style.opacity = '0';
+            }
+        }
     });
 </script>
 
@@ -343,8 +510,6 @@ for (let row = 0; row < 3; row++) {
         border-radius: 12px;
         margin-bottom: 20px;
         width: 100%;
-        max-width: 1200px;
-        margin: 0 auto 20px;
         overflow: visible;
     }
 
@@ -431,6 +596,25 @@ for (let row = 0; row < 3; row++) {
     
     .champion-card:hover {
         transform: scale(1.05);
+    }
+    
+    .champion-controls {
+        transition: opacity 0.2s ease;
+    }
+    
+    .cost-badge {
+        z-index: 5;
+        font-size: 0.75rem;
+        box-shadow: 0 0 3px rgba(0, 0, 0, 0.5);
+    }
+    
+    .star-level {
+        text-shadow: 0 0 3px rgba(0, 0, 0, 0.8);
+        font-size: 0.8rem;
+    }
+    
+    .items-container {
+        z-index: 4;
     }
     
     .item-card {
