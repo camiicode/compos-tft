@@ -4,7 +4,7 @@ Una aplicación web minimalista desarrollada en **Astro + React** para crear, vi
 
 Ideal para jugadores que quieren planear sus partidas o compartir sus builds favoritas con facilidad.
 
-
+![compos-tft-preview](./public/preview.png) 
 
 ---
 
