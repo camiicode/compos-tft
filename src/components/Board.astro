@@ -1,0 +1,261 @@
+---
+import { getChampions, getItems } from '../services/riotApi';
+import type { Champion, Item, BoardCell } from '../types/tft';
+
+const champions = await getChampions();
+const items = await getItems();
+
+// Crear el tablero vacío
+const board: BoardCell[] = [];
+for (let row = 0; row < 4; row++) {
+    for (let col = 0; col < 7; col++) {
+        board.push({
+            id: `cell-${row}-${col}`,
+            champion: null,
+            position: { row, col }
+        });
+    }
+}
+---
+
+<div class="board-container p-4">
+    <div class="grid grid-cols-7 gap-2" id="board">
+        {board.map((cell) => (
+            <div
+                class="cell bg-gray-800 rounded-lg p-2 min-h-[100px] flex items-center justify-center"
+                data-cell-id={cell.id}
+                data-row={cell.position.row}
+                data-col={cell.position.col}
+            >
+                {cell.champion && (
+                    <div class="champion-card relative">
+                        <div class="text-center">
+                            <p class="font-bold">{cell.champion.name}</p>
+                            <p class="text-sm text-gray-400">Costo: {cell.champion.cost}</p>
+                            <div class="absolute -top-2 -right-2 bg-yellow-500 text-black rounded-full w-6 h-6 flex items-center justify-center">
+                                {cell.champion.level || 1}
+                            </div>
+                            {cell.champion.items && cell.champion.items.length > 0 && (
+                                <div class="absolute bottom-0 left-0 right-0 flex justify-center gap-1">
+                                    {cell.champion.items.map((item) => (
+                                        <span class="text-xs bg-gray-700 px-1 rounded" title={item.name}>
+                                            {item.name}
+                                        </span>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                )}
+            </div>
+        ))}
+    </div>
+</div>
+
+<div class="champions-container mt-4">
+    <h2 class="text-xl font-bold mb-2">Campeones Disponibles</h2>
+    <div class="mb-4">
+        <input 
+            type="text" 
+            id="champion-search" 
+            placeholder="Buscar campeón..." 
+            class="w-full p-2 bg-gray-800 rounded-lg text-white"
+        />
+    </div>
+    <div class="grid grid-cols-12 gap-2" id="champions-list">
+        {champions.map((champion) => (
+            <div
+                class="champion-card bg-gray-800 rounded-lg p-2 cursor-move min-h-[50px]"
+                draggable="true"
+                data-champion-id={champion.id}
+            >
+                <div class="flex flex-col justify-between items-center h-full">
+                    <p class="font-bold">{champion.name}</p>
+                    <p class="text-sm text-gray-400">Costo: {champion.cost}</p>
+                </div>
+            </div>
+        ))}
+    </div>
+</div>
+
+<div class="items-container mt-4">
+    <h2 class="text-xl font-bold mb-2">Items Disponibles</h2>
+    <div class="mb-4">
+        <input 
+            type="text" 
+            id="item-search" 
+            placeholder="Buscar item..." 
+            class="w-full p-2 bg-gray-800 rounded-lg text-white"
+        />
+    </div>
+    <div class="grid grid-cols-12 gap-2" id="items-list">
+        {items.map((item) => (
+            <div
+                class="item-card bg-gray-800 rounded-lg p-2 cursor-move min-h-[150px]"
+                draggable="true"
+                data-item-id={item.id}
+            >
+                <div class="flex flex-col justify-between items-center h-full text-center">
+                    <p class="font-bold">{item.name}</p>
+                    <p class="text-sm text-gray-400">{item.description}</p>
+                </div>
+            </div>
+        ))}
+    </div>
+</div>
+
+<script>
+    // Funcionalidad de búsqueda
+    const championSearch = document.getElementById('champion-search') as HTMLInputElement;
+    const itemSearch = document.getElementById('item-search') as HTMLInputElement;
+    const championsList = document.getElementById('champions-list');
+    const itemsList = document.getElementById('items-list');
+    
+    // Función para filtrar elementos
+    function filterElements(searchInput: HTMLInputElement, listElement: HTMLElement | null, itemClass: string) {
+        if (!searchInput || !listElement) return;
+        
+        const searchTerm = searchInput.value.toLowerCase();
+        const items = listElement.querySelectorAll(`.${itemClass}`);
+        
+        items.forEach(item => {
+            const text = item.textContent?.toLowerCase() || '';
+            if (text.includes(searchTerm)) {
+                (item as HTMLElement).style.display = '';
+            } else {
+                (item as HTMLElement).style.display = 'none';
+            }
+        });
+    }
+    
+    // Eventos de búsqueda
+    championSearch.addEventListener('input', () => {
+        filterElements(championSearch, championsList, 'champion-card');
+    });
+    
+    itemSearch.addEventListener('input', () => {
+        filterElements(itemSearch, itemsList, 'item-card');
+    });
+    
+    // Funcionalidad de arrastrar y soltar
+    const board = document.getElementById('board');
+    const championCards = document.querySelectorAll('.champion-card');
+    const itemCards = document.querySelectorAll('.item-card');
+    const cells = document.querySelectorAll('.cell');
+
+    // Eventos para campeones
+    championCards.forEach(card => {
+        card.addEventListener('dragstart', function(e: Event) {
+            const dragEvent = e as DragEvent;
+            if (dragEvent.dataTransfer) {
+                dragEvent.dataTransfer.setData('text/plain', card.getAttribute('data-champion-id') || '');
+                card.classList.add('opacity-50');
+            }
+        });
+
+        card.addEventListener('dragend', function() {
+            card.classList.remove('opacity-50');
+        });
+    });
+
+    // Eventos para items
+    itemCards.forEach(card => {
+        card.addEventListener('dragstart', function(e: Event) {
+            const dragEvent = e as DragEvent;
+            if (dragEvent.dataTransfer) {
+                dragEvent.dataTransfer.setData('text/plain', card.getAttribute('data-item-id') || '');
+                card.classList.add('opacity-50');
+            }
+        });
+
+        card.addEventListener('dragend', function() {
+            card.classList.remove('opacity-50');
+        });
+    });
+
+    // Eventos para las celdas del tablero
+    cells.forEach(cell => {
+        cell.addEventListener('dragover', function(e: Event) {
+            e.preventDefault();
+            cell.classList.add('bg-gray-700');
+        });
+
+        cell.addEventListener('dragleave', function() {
+            cell.classList.remove('bg-gray-700');
+        });
+
+        cell.addEventListener('drop', function(e: Event) {
+            e.preventDefault();
+            cell.classList.remove('bg-gray-700');
+            
+            const dropEvent = e as DragEvent;
+            if (!dropEvent.dataTransfer) return;
+            
+            const id = dropEvent.dataTransfer.getData('text/plain');
+            const championCard = document.querySelector(`[data-champion-id="${id}"]`);
+            const itemCard = document.querySelector(`[data-item-id="${id}"]`);
+
+            if (championCard) {
+                // Si ya hay un campeón en la celda, incrementar su nivel
+                const existingChampion = cell.querySelector('.champion-card');
+                if (existingChampion) {
+                    const levelElement = existingChampion.querySelector('.bg-yellow-500');
+                    if (levelElement) {
+                        const currentLevel = parseInt(levelElement.textContent || '1');
+                        if (currentLevel < 3) {
+                            levelElement.textContent = (currentLevel + 1).toString();
+                        }
+                    }
+                } else {
+                    // Si la celda está vacía, crear una nueva tarjeta de campeón
+                    const newChampion = championCard.cloneNode(true);
+                    cell.appendChild(newChampion);
+                }
+            } else if (itemCard) {
+                // Agregar item al campeón si hay uno en la celda
+                const championCard = cell.querySelector('.champion-card');
+                if (championCard) {
+                    const itemsContainer = championCard.querySelector('.flex.justify-center.gap-1') || 
+                        document.createElement('div');
+                    if (!itemsContainer.classList.contains('flex')) {
+                        itemsContainer.classList.add('flex', 'justify-center', 'gap-1');
+                        (itemsContainer as HTMLElement).style.position = 'absolute';
+                        (itemsContainer as HTMLElement).style.bottom = '0';
+                        (itemsContainer as HTMLElement).style.left = '0';
+                        (itemsContainer as HTMLElement).style.right = '0';
+                        championCard.appendChild(itemsContainer);
+                    }
+                    
+                    const itemName = itemCard.querySelector('.font-bold')?.textContent || '';
+                    const newItem = document.createElement('span');
+                    newItem.classList.add('text-xs', 'bg-gray-700', 'px-1', 'rounded');
+                    newItem.textContent = itemName;
+                    newItem.title = itemName;
+                    itemsContainer.appendChild(newItem);
+                }
+            }
+        });
+    });
+</script>
+
+<style>
+    .cell {
+        transition: background-color 0.2s;
+    }
+    
+    .champion-card {
+        transition: transform 0.2s;
+    }
+    
+    .champion-card:hover {
+        transform: scale(1.05);
+    }
+    
+    .item-card {
+        transition: transform 0.2s;
+    }
+    
+    .item-card:hover {
+        transform: scale(1.05);
+    }
+</style> 

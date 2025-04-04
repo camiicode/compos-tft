@@ -1,0 +1,43 @@
+---
+import type { Champion } from '../types/tft';
+import { getChampions } from '../services/riotApi';
+
+let champions: Champion[] = [];
+try {
+    champions = await getChampions();
+} catch (error) {
+    console.error('Error al cargar los campeones:', error);
+}
+---
+
+<div class="champion-list p-4 bg-gray-800 rounded-lg">
+    <h2 class="text-xl font-bold mb-4">Campeones Disponibles</h2>
+    <div class="grid grid-cols-4 gap-4">
+        {champions.map((champion: Champion) => (
+            <div 
+                class="champion-card bg-gray-700 p-2 rounded-lg cursor-pointer hover:bg-gray-600 transition-colors"
+                draggable="true"
+                data-champion-id={champion.id}
+            >
+                <div class="flex items-center gap-2">
+                    <img 
+                        src={champion.icon} 
+                        alt={champion.name}
+                        class="w-10 h-10 rounded-full"
+                    />
+                    <div>
+                        <h3 class="font-semibold">{champion.name}</h3>
+                        <p class="text-sm text-gray-300">Costo: {champion.cost}</p>
+                    </div>
+                </div>
+            </div>
+        ))}
+    </div>
+</div>
+
+<style>
+    .champion-list {
+        max-width: 800px;
+        margin: 0 auto;
+    }
+</style> 

@@ -1,0 +1,27 @@
+---
+// Aquí podrías recibir un array de posiciones
+---
+
+<div class="composition-board p-4">
+    <h2 class="text-xl font-bold mb-4">Tablero de Composición</h2>
+    <div class="grid grid-cols-7 gap-2">
+        {Array(28).fill(null).map((_, index) => (
+            <div 
+                class="champion-slot w-16 h-16 bg-gray-800 rounded-lg border border-gray-700 flex items-center justify-center cursor-pointer hover:bg-gray-700 transition-colors"
+                data-slot={index}
+            >
+                <span class="text-gray-500 text-sm">{index + 1}</span>
+            </div>
+        ))}
+    </div>
+</div>
+
+<style>
+    .composition-board {
+        max-width: 800px;
+        margin: 0 auto;
+    }
+    .champion-slot {
+        aspect-ratio: 1;
+    }
+</style>
