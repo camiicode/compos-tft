@@ -67,3 +67,26 @@ Tu archivo `.env` está excluido del repositorio (.gitignore). Nunca subas tu cl
 
 [LICENSE](./LICENSE)
 
+# TFT Compositor
+
+TFT Compositor es una aplicación para crear y compartir composiciones de Teamfight Tactics. Permite a los usuarios:
+
+- Arrastrar y soltar campeones en un tablero hexagonal.
+- Equipar objetos a los campeones.
+- Ajustar el nivel de estrellas de los campeones.
+- Guardar y cargar composiciones desde el almacenamiento local.
+- Importar y exportar composiciones en formato JSON.
+- Mover campeones en el tablero sin perder objetos o niveles.
+- Ver una lista de campeones y objetos disponibles.
+- Buscar campeones y objetos por nombre.
+
+## Instalación
+
+1. Clona el repositorio.
+2. Ejecuta `npm install` para instalar las dependencias.
+3. Ejecuta `npm run dev` para iniciar la aplicación en modo de desarrollo.
+
+## Contribución
+
+Por favor, consulta el archivo `CONTRIBUTING.md` para obtener detalles sobre nuestro proceso de contribución.
+
