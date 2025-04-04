@@ -5,9 +5,9 @@ import type { Champion, Item, BoardCell } from '../types/tft';
 const champions = await getChampions();
 const items = await getItems();
 
-// Crear el tablero vacío
+// Crear el tablero vacío con 3 filas
 const board: BoardCell[] = [];
-for (let row = 0; row < 4; row++) {
+for (let row = 0; row < 3; row++) {
     for (let col = 0; col < 7; col++) {
         board.push({
             id: `cell-${row}-${col}`,
@@ -18,35 +18,42 @@ for (let row = 0; row < 4; row++) {
 }
 ---
 
-<div class="board-container p-4">
-    <div class="grid grid-cols-7 gap-2" id="board">
+<div class="board-container">
+    <div class="board-grid" id="board">
         {board.map((cell) => (
             <div
-                class="cell bg-gray-800 rounded-lg p-2 min-h-[100px] flex items-center justify-center"
+                class="hex-cell"
                 data-cell-id={cell.id}
                 data-row={cell.position.row}
                 data-col={cell.position.col}
             >
-                {cell.champion && (
-                    <div class="champion-card relative">
-                        <div class="text-center">
-                            <p class="font-bold">{cell.champion.name}</p>
-                            <p class="text-sm text-gray-400">Costo: {cell.champion.cost}</p>
+                <div class="hex-content">
+                    {cell.champion && (
+                        <div class="champion-card relative">
+                            <img 
+                                src={cell.champion.icon} 
+                                alt={cell.champion.name} 
+                                title={cell.champion.name}
+                                class="w-16 h-16 rounded-full object-cover"
+                            />
                             <div class="absolute -top-2 -right-2 bg-yellow-500 text-black rounded-full w-6 h-6 flex items-center justify-center">
                                 {cell.champion.level || 1}
                             </div>
                             {cell.champion.items && cell.champion.items.length > 0 && (
                                 <div class="absolute bottom-0 left-0 right-0 flex justify-center gap-1">
                                     {cell.champion.items.map((item) => (
-                                        <span class="text-xs bg-gray-700 px-1 rounded" title={item.name}>
-                                            {item.name}
-                                        </span>
+                                        <img 
+                                            src={item.icon} 
+                                            alt={item.name} 
+                                            title={item.name}
+                                            class="w-6 h-6 rounded-full object-cover"
+                                        />
                                     ))}
                                 </div>
                             )}
                         </div>
-                    </div>
-                )}
+                    )}
+                </div>
             </div>
         ))}
     </div>
@@ -62,19 +69,31 @@ for (let row = 0; row < 4; row++) {
             class="w-full p-2 bg-gray-800 rounded-lg text-white"
         />
     </div>
-    <div class="grid grid-cols-12 gap-2" id="champions-list">
-        {champions.map((champion) => (
+    <div class="grid grid-cols-4 md:grid-cols-5 lg:grid-cols-10 gap-2" id="champions-list">
+        {champions.map((champion, index) => (
             <div
-                class="champion-card bg-gray-800 rounded-lg p-2 cursor-move min-h-[50px]"
+                class={`champion-card-grid bg-gray-800 rounded-lg p-2 cursor-move ${index >= 20 ? 'hidden initial-hidden' : ''}`}
                 draggable="true"
                 data-champion-id={champion.id}
             >
-                <div class="flex flex-col justify-between items-center h-full">
-                    <p class="font-bold">{champion.name}</p>
-                    <p class="text-sm text-gray-400">Costo: {champion.cost}</p>
+                <div class="flex flex-col items-center h-full relative">
+                    <img 
+                        src={champion.icon} 
+                        alt={champion.name} 
+                        title={champion.name}
+                        class="w-16 h-16 rounded-full object-cover"
+                    />
+                    <div class="absolute top-0 right-0 bg-yellow-500 text-black rounded-full w-6 h-6 flex items-center justify-center" title="Costo">
+                        {champion.cost}
+                    </div>
                 </div>
             </div>
         ))}
+    </div>
+    <div class="text-center mt-2">
+        <button id="show-more-champions" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">
+            Mostrar más campeones
+        </button>
     </div>
 </div>
 
@@ -88,23 +107,59 @@ for (let row = 0; row < 4; row++) {
             class="w-full p-2 bg-gray-800 rounded-lg text-white"
         />
     </div>
-    <div class="grid grid-cols-12 gap-2" id="items-list">
-        {items.map((item) => (
+    <div class="grid grid-cols-4 md:grid-cols-5 lg:grid-cols-10 gap-2" id="items-list">
+        {items.map((item, index) => (
             <div
-                class="item-card bg-gray-800 rounded-lg p-2 cursor-move min-h-[150px]"
+                class={`item-card bg-gray-800 rounded-lg p-2 cursor-move ${index >= 20 ? 'hidden initial-hidden' : ''}`}
                 draggable="true"
                 data-item-id={item.id}
             >
-                <div class="flex flex-col justify-between items-center h-full text-center">
-                    <p class="font-bold">{item.name}</p>
-                    <p class="text-sm text-gray-400">{item.description}</p>
+                <div class="flex flex-col items-center h-full relative">
+                    <img 
+                        src={item.icon} 
+                        alt={item.name} 
+                        title={item.name}
+                        class="w-16 h-16 rounded-full object-cover"
+                    />
+                    <p class="text-xs mt-1 text-center text-gray-300">{item.name}</p>
                 </div>
             </div>
         ))}
     </div>
+    <div class="text-center mt-2">
+        <button id="show-more-items" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">
+            Mostrar más items
+        </button>
+    </div>
 </div>
 
 <script>
+    // Funcionalidad para mostrar más campeones
+    const showMoreChampionsBtn = document.getElementById('show-more-champions');
+    const hiddenChampions = document.querySelectorAll('#champions-list .initial-hidden');
+    
+    if (showMoreChampionsBtn) {
+        showMoreChampionsBtn.addEventListener('click', function() {
+            hiddenChampions.forEach(card => {
+                card.classList.remove('hidden');
+            });
+            showMoreChampionsBtn.style.display = 'none';
+        });
+    }
+    
+    // Funcionalidad para mostrar más items
+    const showMoreItemsBtn = document.getElementById('show-more-items');
+    const hiddenItems = document.querySelectorAll('#items-list .initial-hidden');
+    
+    if (showMoreItemsBtn) {
+        showMoreItemsBtn.addEventListener('click', function() {
+            hiddenItems.forEach(card => {
+                card.classList.remove('hidden');
+            });
+            showMoreItemsBtn.style.display = 'none';
+        });
+    }
+
     // Funcionalidad de búsqueda
     const championSearch = document.getElementById('champion-search') as HTMLInputElement;
     const itemSearch = document.getElementById('item-search') as HTMLInputElement;
@@ -117,20 +172,33 @@ for (let row = 0; row < 4; row++) {
         
         const searchTerm = searchInput.value.toLowerCase();
         const items = listElement.querySelectorAll(`.${itemClass}`);
+        let visibleCount = 0;
         
         items.forEach(item => {
-            const text = item.textContent?.toLowerCase() || '';
-            if (text.includes(searchTerm)) {
+            const titleAttr = item.querySelector('[title]')?.getAttribute('title')?.toLowerCase() || '';
+            
+            if (titleAttr.includes(searchTerm)) {
                 (item as HTMLElement).style.display = '';
+                item.classList.remove('hidden');
+                visibleCount++;
             } else {
                 (item as HTMLElement).style.display = 'none';
             }
         });
+        
+        // Si hay búsqueda, ocultar el botón "Mostrar más"
+        const showMoreBtn = listElement.id === 'champions-list' ? 
+            document.getElementById('show-more-champions') : 
+            document.getElementById('show-more-items');
+            
+        if (showMoreBtn) {
+            showMoreBtn.style.display = searchTerm ? 'none' : '';
+        }
     }
     
     // Eventos de búsqueda
     championSearch.addEventListener('input', () => {
-        filterElements(championSearch, championsList, 'champion-card');
+        filterElements(championSearch, championsList, 'champion-card-grid');
     });
     
     itemSearch.addEventListener('input', () => {
@@ -139,9 +207,9 @@ for (let row = 0; row < 4; row++) {
     
     // Funcionalidad de arrastrar y soltar
     const board = document.getElementById('board');
-    const championCards = document.querySelectorAll('.champion-card');
+    const championCards = document.querySelectorAll('.champion-card-grid');
     const itemCards = document.querySelectorAll('.item-card');
-    const cells = document.querySelectorAll('.cell');
+    const cells = document.querySelectorAll('.hex-cell');
 
     // Eventos para campeones
     championCards.forEach(card => {
@@ -173,20 +241,20 @@ for (let row = 0; row < 4; row++) {
         });
     });
 
-    // Eventos para las celdas del tablero
+    // Actualizar los eventos de las celdas
     cells.forEach(cell => {
         cell.addEventListener('dragover', function(e: Event) {
             e.preventDefault();
-            cell.classList.add('bg-gray-700');
+            cell.classList.add('drag-over');
         });
 
         cell.addEventListener('dragleave', function() {
-            cell.classList.remove('bg-gray-700');
+            cell.classList.remove('drag-over');
         });
 
         cell.addEventListener('drop', function(e: Event) {
             e.preventDefault();
-            cell.classList.remove('bg-gray-700');
+            cell.classList.remove('drag-over');
             
             const dropEvent = e as DragEvent;
             if (!dropEvent.dataTransfer) return;
@@ -208,30 +276,60 @@ for (let row = 0; row < 4; row++) {
                     }
                 } else {
                     // Si la celda está vacía, crear una nueva tarjeta de campeón
-                    const newChampion = championCard.cloneNode(true);
-                    cell.appendChild(newChampion);
+                    const champImg = championCard.querySelector('img');
+                    const champCost = championCard.querySelector('.bg-yellow-500')?.textContent;
+                    
+                    if (champImg) {
+                        const hexContent = cell.querySelector('.hex-content');
+                        if (hexContent) {
+                            const newChampion = document.createElement('div');
+                            newChampion.className = 'champion-card relative';
+                            
+                            // Copiar la imagen
+                            const newImg = document.createElement('img');
+                            newImg.src = champImg.src;
+                            newImg.alt = champImg.alt;
+                            newImg.title = champImg.title;
+                            newImg.className = 'w-16 h-16 rounded-full object-cover';
+                            
+                            // Añadir el nivel
+                            const levelDiv = document.createElement('div');
+                            levelDiv.className = 'absolute -top-2 -right-2 bg-yellow-500 text-black rounded-full w-6 h-6 flex items-center justify-center';
+                            levelDiv.textContent = '1';
+                            
+                            newChampion.appendChild(newImg);
+                            newChampion.appendChild(levelDiv);
+                            hexContent.appendChild(newChampion);
+                        }
+                    }
                 }
             } else if (itemCard) {
                 // Agregar item al campeón si hay uno en la celda
                 const championCard = cell.querySelector('.champion-card');
                 if (championCard) {
-                    const itemsContainer = championCard.querySelector('.flex.justify-center.gap-1') || 
-                        document.createElement('div');
-                    if (!itemsContainer.classList.contains('flex')) {
-                        itemsContainer.classList.add('flex', 'justify-center', 'gap-1');
-                        (itemsContainer as HTMLElement).style.position = 'absolute';
-                        (itemsContainer as HTMLElement).style.bottom = '0';
-                        (itemsContainer as HTMLElement).style.left = '0';
-                        (itemsContainer as HTMLElement).style.right = '0';
-                        championCard.appendChild(itemsContainer);
+                    const itemImg = itemCard.querySelector('img');
+                    if (itemImg) {
+                        const itemsContainer = championCard.querySelector('.flex.justify-center.gap-1') || 
+                            document.createElement('div');
+                            
+                        if (!itemsContainer.classList.contains('flex')) {
+                            itemsContainer.classList.add('flex', 'justify-center', 'gap-1');
+                            (itemsContainer as HTMLElement).style.position = 'absolute';
+                            (itemsContainer as HTMLElement).style.bottom = '0';
+                            (itemsContainer as HTMLElement).style.left = '0';
+                            (itemsContainer as HTMLElement).style.right = '0';
+                            championCard.appendChild(itemsContainer);
+                        }
+                        
+                        // Copiar la imagen del item
+                        const newItemImg = document.createElement('img');
+                        newItemImg.src = itemImg.src;
+                        newItemImg.alt = itemImg.alt;
+                        newItemImg.title = itemImg.title;
+                        newItemImg.className = 'w-6 h-6 rounded-full object-cover';
+                        
+                        itemsContainer.appendChild(newItemImg);
                     }
-                    
-                    const itemName = itemCard.querySelector('.font-bold')?.textContent || '';
-                    const newItem = document.createElement('span');
-                    newItem.classList.add('text-xs', 'bg-gray-700', 'px-1', 'rounded');
-                    newItem.textContent = itemName;
-                    newItem.title = itemName;
-                    itemsContainer.appendChild(newItem);
                 }
             }
         });
@@ -239,12 +337,96 @@ for (let row = 0; row < 4; row++) {
 </script>
 
 <style>
-    .cell {
+    .board-container {
+        padding: 30px;
+        background: rgba(0, 0, 0, 0.3);
+        border-radius: 12px;
+        margin-bottom: 20px;
+        width: 100%;
+        max-width: 1200px;
+        margin: 0 auto 20px;
+        overflow: visible;
+    }
+
+    .board-grid {
+        display: grid;
+        grid-template-rows: repeat(3, 120px);
+        grid-template-columns: repeat(7, 1fr);
+        gap: 15px 0px;
+        position: relative;
+    }
+
+    .hex-cell {
+        width: 80%;
+        height: 110px;
+        position: relative;
+        filter: drop-shadow(0px 0px 1px white);
+    }
+
+    /* Fondo del hexágono */
+    .hex-cell::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: #1a1c2c;
+        clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
         transition: background-color 0.2s;
     }
+
+    /* Borde del hexágono */
+    .hex-cell::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: none;
+        clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
+        box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.3);
+        transition: box-shadow 0.2s;
+        pointer-events: none;
+    }
+
+    .hex-cell:hover::before {
+        background: #2a2c3c;
+    }
     
+    .hex-cell:hover::after {
+        box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.5);
+    }
+
+    .hex-content {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 1;
+        width: 90%;
+        height: 90%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* Ajustar posición de las filas para el patrón escalonado */
+    .board-grid > .hex-cell:nth-child(n+8):nth-child(-n+14) {
+        transform: translateX(calc(50% - 15px));
+    }
+
     .champion-card {
         transition: transform 0.2s;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: transparent;
+        padding: 4px;
+        border-radius: 8px;
     }
     
     .champion-card:hover {
@@ -257,5 +439,48 @@ for (let row = 0; row < 4; row++) {
     
     .item-card:hover {
         transform: scale(1.05);
+    }
+
+    /* Estilo para cuando se está arrastrando sobre la celda */
+    .hex-cell.drag-over::before {
+        background: #3a3c4c;
+    }
+    
+    .hex-cell.drag-over::after {
+        box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.7);
+    }
+
+    .champion-card .text-center {
+        background: rgba(26, 28, 44, 0.8);
+        padding: 8px;
+        border-radius: 6px;
+        width: 100%;
+    }
+
+    @media (max-width: 1024px) {
+        .board-grid {
+            grid-template-rows: repeat(3, 100px);
+            gap: 10px 25px;
+        }
+        
+        .hex-cell {
+            height: 90px;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .board-grid {
+            grid-template-rows: repeat(3, 80px);
+            gap: 8px 18px;
+        }
+        
+        .hex-cell {
+            height: 70px;
+        }
+        
+        .champion-card .text-center {
+            padding: 4px;
+            font-size: 0.8rem;
+        }
     }
 </style> 

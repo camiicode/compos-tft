@@ -4,6 +4,7 @@ import type { Champion, Item } from '../types/tft';
 const RIOT_API_KEY = import.meta.env.RIOT_API_KEY;
 const BASE_URL = 'https://americas.api.riotgames.com/tft';
 const DDragon_URL = 'https://ddragon.leagueoflegends.com/cdn/13.24.1/data/en_US';
+const DDragon_IMG_URL = 'https://ddragon.leagueoflegends.com/cdn/13.24.1/img';
 
 const api = axios.create({
     baseURL: BASE_URL,
@@ -28,7 +29,7 @@ export async function getChampions(): Promise<Champion[]> {
                 name: "Habilidad",
                 description: "Descripción de la habilidad"
             },
-            icon: "" // No cargaremos imágenes por ahora
+            icon: `${DDragon_IMG_URL}/tft-champion/${champion.image.full}` // URL de la imagen
         }));
         
         return champions;
@@ -46,7 +47,7 @@ export async function getChampions(): Promise<Champion[]> {
                     name: "Spirit Rush",
                     description: "Lanza orbes de esencia que dañan a los enemigos"
                 },
-                icon: ""
+                icon: "https://ddragon.leagueoflegends.com/cdn/13.24.1/img/champion/Ahri.png"
             },
             {
                 id: "TFT9_Kaisa",
@@ -57,7 +58,7 @@ export async function getChampions(): Promise<Champion[]> {
                     name: "Killer Instinct",
                     description: "Se lanza hacia el enemigo más lejano"
                 },
-                icon: ""
+                icon: "https://ddragon.leagueoflegends.com/cdn/13.24.1/img/champion/Kaisa.png"
             },
             {
                 id: "TFT9_Yasuo",
@@ -68,7 +69,7 @@ export async function getChampions(): Promise<Champion[]> {
                     name: "Last Breath",
                     description: "Daña a los enemigos en línea"
                 },
-                icon: ""
+                icon: "https://ddragon.leagueoflegends.com/cdn/13.24.1/img/champion/Yasuo.png"
             },
             {
                 id: "TFT9_Lux",
@@ -79,7 +80,7 @@ export async function getChampions(): Promise<Champion[]> {
                     name: "Final Spark",
                     description: "Lanza un rayo de luz que daña a los enemigos"
                 },
-                icon: ""
+                icon: "https://ddragon.leagueoflegends.com/cdn/13.24.1/img/champion/Lux.png"
             },
             {
                 id: "TFT9_Malzahar",
@@ -90,7 +91,7 @@ export async function getChampions(): Promise<Champion[]> {
                     name: "Nether Grasp",
                     description: "Suprime a un enemigo y le daña"
                 },
-                icon: ""
+                icon: "https://ddragon.leagueoflegends.com/cdn/13.24.1/img/champion/Malzahar.png"
             },
             {
                 id: "TFT9_Kassadin",
@@ -101,7 +102,7 @@ export async function getChampions(): Promise<Champion[]> {
                     name: "Force Pulse",
                     description: "Daña a los enemigos cercanos"
                 },
-                icon: ""
+                icon: "https://ddragon.leagueoflegends.com/cdn/13.24.1/img/champion/Kassadin.png"
             },
             {
                 id: "TFT9_Soraka",
@@ -112,7 +113,7 @@ export async function getChampions(): Promise<Champion[]> {
                     name: "Wish",
                     description: "Cura a los aliados con menos vida"
                 },
-                icon: ""
+                icon: "https://ddragon.leagueoflegends.com/cdn/13.24.1/img/champion/Soraka.png"
             },
             {
                 id: "TFT9_Jinx",
@@ -123,7 +124,51 @@ export async function getChampions(): Promise<Champion[]> {
                     name: "Get Excited!",
                     description: "Gana velocidad de ataque al derrotar enemigos"
                 },
-                icon: ""
+                icon: "https://ddragon.leagueoflegends.com/cdn/13.24.1/img/champion/Jinx.png"
+            },
+            {
+                id: "TFT9_Ekko",
+                name: "Ekko",
+                cost: 3,
+                traits: ["Pulsefire", "Rogue"],
+                ability: {
+                    name: "Parallel Convergence",
+                    description: "Crea un campo que aturde a los enemigos"
+                },
+                icon: "https://ddragon.leagueoflegends.com/cdn/13.24.1/img/champion/Ekko.png"
+            },
+            {
+                id: "TFT9_Senna",
+                name: "Senna",
+                cost: 1,
+                traits: ["Redeemer", "Gunner"],
+                ability: {
+                    name: "Piercing Darkness",
+                    description: "Dispara un rayo que daña y cura"
+                },
+                icon: "https://ddragon.leagueoflegends.com/cdn/13.24.1/img/champion/Senna.png"
+            },
+            {
+                id: "TFT9_Garen",
+                name: "Garen",
+                cost: 1,
+                traits: ["Demacia", "Vanguard"],
+                ability: {
+                    name: "Judgement",
+                    description: "Gira y daña a los enemigos cercanos"
+                },
+                icon: "https://ddragon.leagueoflegends.com/cdn/13.24.1/img/champion/Garen.png"
+            },
+            {
+                id: "TFT9_Irelia",
+                name: "Irelia",
+                cost: 3,
+                traits: ["Ionia", "Blade Master"],
+                ability: {
+                    name: "Bladesurge",
+                    description: "Salta al enemigo y lo daña"
+                },
+                icon: "https://ddragon.leagueoflegends.com/cdn/13.24.1/img/champion/Irelia.png"
             }
         ];
         
@@ -142,7 +187,7 @@ export async function getItems(): Promise<Item[]> {
             id: item.id,
             name: item.name,
             description: "Descripción del item",
-            icon: "" // No cargaremos imágenes por ahora
+            icon: `${DDragon_IMG_URL}/tft-item/${item.image.full}` // URL de la imagen
         }));
         
         return items;
@@ -155,49 +200,49 @@ export async function getItems(): Promise<Item[]> {
                 id: "1",
                 name: "B.F. Sword",
                 description: "+10 Attack Damage",
-                icon: ""
+                icon: "https://ddragon.leagueoflegends.com/cdn/13.24.1/img/item/1001.png"
             },
             {
                 id: "2",
                 name: "Recurve Bow",
                 description: "+10% Attack Speed",
-                icon: ""
+                icon: "https://ddragon.leagueoflegends.com/cdn/13.24.1/img/item/1043.png"
             },
             {
                 id: "3",
                 name: "Needlessly Large Rod",
                 description: "+10 Ability Power",
-                icon: ""
+                icon: "https://ddragon.leagueoflegends.com/cdn/13.24.1/img/item/1058.png"
             },
             {
                 id: "4",
                 name: "Tear of the Goddess",
                 description: "+15 Mana",
-                icon: ""
+                icon: "https://ddragon.leagueoflegends.com/cdn/13.24.1/img/item/3070.png"
             },
             {
                 id: "5",
                 name: "Chain Vest",
                 description: "+20 Armor",
-                icon: ""
+                icon: "https://ddragon.leagueoflegends.com/cdn/13.24.1/img/item/1031.png"
             },
             {
                 id: "6",
                 name: "Negatron Cloak",
                 description: "+20 Magic Resist",
-                icon: ""
+                icon: "https://ddragon.leagueoflegends.com/cdn/13.24.1/img/item/1057.png"
             },
             {
                 id: "7",
                 name: "Giant's Belt",
                 description: "+150 Health",
-                icon: ""
+                icon: "https://ddragon.leagueoflegends.com/cdn/13.24.1/img/item/1011.png"
             },
             {
                 id: "8",
                 name: "Spatula",
                 description: "Componente especial para crear items únicos",
-                icon: ""
+                icon: "https://ddragon.leagueoflegends.com/cdn/13.24.1/img/item/3311.png"
             }
         ];
         
