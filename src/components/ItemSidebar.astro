@@ -1,4 +1,4 @@
-0---
+---
 import type { Item } from '../types/tft';
 import { getItems } from '../services/riotApi';
 
@@ -11,7 +11,7 @@ const items = await getItems();
 
 <div class="item-sidebar absolute border -left-8 top-[50px] h-[calc(100%-100px)] w-16 bg-gray-900 border-r border-gray-700 p-2 flex flex-col items-center gap-2 overflow-y-auto overflow-x-hidden">
     <div class="items-container flex flex-col gap-2" id="sidebar-items-container"></div>
-    <button id="check-combinations-btn" class="bg-[rgba(255,255,255,.05)] hover:bg-[rgba(255,255,255,.25)] transition-colors transition-opacity text-white px-2 py-1 sm:px-2 rounded text-sm sm:text-base" title="Exportar composición">
+    <button id="check-combinations-btn" class="bg-[rgba(255,255,255,.05)] hover:bg-[rgba(255,255,255,.25)] transition-colors transition-opacity text-white px-2 py-1 sm:px-2 rounded text-sm sm:text-base" title="Verificar composición">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6"><path fill-rule="evenodd" d="M10.5 3.75a6.75 6.75 0 1 0 0 13.5 6.75 6.75 0 0 0 0-13.5ZM2.25 10.5a8.25 8.25 0 1 1 14.59 5.28l4.69 4.69a.75.75 0 1 1-1.06 1.06l-4.69-4.69A8.25 8.25 0 0 1 2.25 10.5Z" clip-rule="evenodd" /></svg>
     </button>
 </div>

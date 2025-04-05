@@ -1151,6 +1151,16 @@ for (let row = 0; row < 4; row++) {
     });
 </script>
 
+<style is:inline>
+    .champion-card.border-gray-400,
+    .champion-card.border-green-500,
+    .champion-card.border-blue-500,
+    .champion-card.border-purple-500,
+    .champion-card.border-orange-500 {
+        border: 0px solid transparent !important;
+    }
+</style>
+
 <style>
     .board-container {
         padding: 15px;
@@ -1180,6 +1190,12 @@ for (let row = 0; row < 4; row++) {
         position: relative;
         filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.5));
         transition: filter 0.3s ease;
+    }
+    
+    .hex-cell,
+    .hex-cell::before,
+    .hex-cell::after {
+        border: none !important;
     }
     
     .hex-cell:has(.champion-card.border-gray-400) {
