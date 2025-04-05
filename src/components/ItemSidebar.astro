@@ -22,7 +22,10 @@ const items = await getItems();
     }
 
     .item-sidebar .items-container {
-        min-height: 90%;
+        height: 90%;
+        width: 90%;
+        overflow-y: scroll;
+        overflow-x: hidden;
     }
 
     .item-sidebar img {
@@ -31,6 +34,35 @@ const items = await getItems();
 
     .item-sidebar img:hover {
         transform: scale(1.1);
+    }
+
+    
+    :root {
+        --sb-track-color: transparent;
+        --sb-thumb-color: #ffffff;
+        --sb-size: 1px;
+    }
+
+    .items-container::-webkit-scrollbar {
+    width: var(--sb-size)
+    }
+
+    .items-container::-webkit-scrollbar-track {
+    background: var(--sb-track-color);
+    border-radius: 1px;
+    }
+
+    .items-container::-webkit-scrollbar-thumb {
+    background: var(--sb-thumb-color);
+    border-radius: 1px;
+    
+    }
+
+    @supports not selector(::-webkit-scrollbar) {
+    .items-container {
+        scrollbar-color: var(--sb-thumb-color)
+                        var(--sb-track-color);
+        }
     }
 </style>
 
@@ -59,11 +91,11 @@ const items = await getItems();
                     newItemImg.alt = itemImg.alt;
                     newItemImg.title = itemImg.title;
                     newItemImg.setAttribute('data-item-id', itemId);
-                    newItemImg.className = 'w-8 h-8 sm:w-10 sm:h-10 object-cover object-right border-2 border-yellow-400 cursor-pointer';
+                    newItemImg.className = 'w-full h-auto object-cover object-right border-2 border-yellow-400 cursor-pointer ';
                     
                     // Agregar botón para eliminar el objeto
                     const removeBtn = document.createElement('button');
-                    removeBtn.className = 'absolute -top-1 -right-1 bg-red-600 text-white rounded-full w-4 h-4 flex items-center justify-center text-xs';
+                    removeBtn.className = 'absolute -top-1 -right-1 bg-red-600 text-white rounded-full flex items-center justify-center text-xs hidden hover:block';
                     removeBtn.textContent = '×';
                     removeBtn.onclick = () => newItemImg.remove();
                     

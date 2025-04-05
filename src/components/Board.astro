@@ -1178,11 +1178,11 @@ for (let row = 0; row < 4; row++) {
         gap: 10px 5px;
         position: relative;
         max-width: 90%;
-        margin: 0 auto;
+        margin: 0 2rem;
     }
 
     .hex-cell {
-        width: 100%;
+        width: 90%;
         height: 100%;
         display: flex;
         align-items: center;
@@ -1199,23 +1199,23 @@ for (let row = 0; row < 4; row++) {
     }
     
     .hex-cell:has(.champion-card.border-gray-400) {
-        filter: drop-shadow(0 0 5px rgba(156, 163, 175, 0.5));
+        filter: drop-shadow(0 0 5px rgba(156, 163, 175, 0.95));
     }
     
     .hex-cell:has(.champion-card.border-green-500) {
-        filter: drop-shadow(0 0 5px rgba(34, 197, 94, 0.5));
+        filter: drop-shadow(0 0 5px rgba(34, 197, 94, 0.95));
     }
     
     .hex-cell:has(.champion-card.border-blue-500) {
-        filter: drop-shadow(0 0 5px rgba(59, 130, 246, 0.5));
+        filter: drop-shadow(0 0 5px rgba(59, 130, 246, 0.95));
     }
     
     .hex-cell:has(.champion-card.border-purple-500) {
-        filter: drop-shadow(0 0 5px rgba(168, 85, 247, 0.5));
+        filter: drop-shadow(0 0 5px rgba(168, 85, 247, 0.95));
     }
     
     .hex-cell:has(.champion-card.border-orange-500) {
-        filter: drop-shadow(0 0 5px rgba(249, 115, 22, 0.5));
+        filter: drop-shadow(0 0 5px rgba(249, 115, 22, 0.95));
     }
 
     .hex-cell::before {
@@ -1223,10 +1223,10 @@ for (let row = 0; row < 4; row++) {
         position: absolute;
         top: 0;
         left: 0;
-        width: 100%;
+        width: 90%;
         height: 100%;
         background: #1a1c2c;
-        clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
+        clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
         transition: background-color 0.2s;
     }
 
@@ -1235,27 +1235,21 @@ for (let row = 0; row < 4; row++) {
         position: absolute;
         top: 0;
         left: 0;
-        width: 100%;
+        width: 90%;
         height: 100%;
         background: none;
-        clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
-        box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.3);
-        transition: box-shadow 0.2s;
+        clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);        transition: box-shadow 0.2s;
         pointer-events: none;
     }
 
     .hex-cell:hover::before {
         background: #2a2c3c;
     }
-    
-    .hex-cell:hover::after {
-        box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.7);
-    }
 
     .hex-content {
         position: absolute;
         top: 50%;
-        left: 50%;
+        left: 45%;
         transform: translate(-50%, -50%);
         z-index: 1;
         width: 90%;
@@ -1319,10 +1313,6 @@ for (let row = 0; row < 4; row++) {
     .hex-cell.drag-over::before {
         background: #3a3c4c;
     }
-    
-    .hex-cell.drag-over::after {
-        box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.7);
-    }
 
     .transition-opacity {
         transition: opacity 0.3s ease;
@@ -1335,7 +1325,7 @@ for (let row = 0; row < 4; row++) {
         
         .board-grid {
             grid-template-rows: repeat(4, 100px);
-            gap: 15px 10px;
+            gap: 0px 10px;
         }
         
         .hex-cell {
@@ -1367,7 +1357,7 @@ for (let row = 0; row < 4; row++) {
         
         .board-grid {
             grid-template-rows: repeat(4, 120px);
-            gap: 20px 15px;
+            gap: 0px 15px;
         }
         
         .hex-cell {
