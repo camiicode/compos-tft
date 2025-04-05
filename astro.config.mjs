@@ -4,5 +4,15 @@ import tailwind from '@astrojs/tailwind';
 
 // https://astro.build/config
 export default defineConfig({
-  integrations: [tailwind()]
+  integrations: [tailwind()],
+  base: '/compos-tft',
+  build: {
+    assets: 'assets',
+  },
+  vite: {
+    build: {
+      assetsDir: 'assets',
+      cssCodeSplit: false,
+    }
+  }
 });

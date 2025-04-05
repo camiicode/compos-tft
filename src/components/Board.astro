@@ -5,9 +5,9 @@ import type { Champion, Item, BoardCell } from '../types/tft';
 const champions = await getChampions();
 const items = await getItems();
 
-// Crear el tablero vacío con 3 filas
+// Crear el tablero vacío con 4 filas
 const board: BoardCell[] = [];
-for (let row = 0; row < 3; row++) {
+for (let row = 0; row < 4; row++) {
     for (let col = 0; col < 7; col++) {
         board.push({
             id: `cell-${row}-${col}`,
@@ -42,14 +42,23 @@ for (let row = 0; row < 3; row++) {
         <div class="board-grid" id="board">
             {board.map((cell) => (
                 <div
-                    class="hex-cell"
+                    class="hex-cell relative"
                     data-cell-id={cell.id}
                     data-row={cell.position.row}
                     data-col={cell.position.col}
                 >
                     <div class="hex-content">
                         {cell.champion && (
-                            <div class="champion-card relative">
+                            <div class="champion-card relative" class:list={[
+                                "border-2",
+                                {
+                                    "border-gray-400": cell.champion.cost === 1,
+                                    "border-green-500": cell.champion.cost === 2,
+                                    "border-blue-500": cell.champion.cost === 3,
+                                    "border-purple-500": cell.champion.cost === 4,
+                                    "border-orange-500": cell.champion.cost >= 5
+                                }
+                            ]}>
                                 <img 
                                     src={cell.champion.icon} 
                                     alt={cell.champion.name} 
@@ -70,10 +79,6 @@ for (let row = 0; row < 3; row++) {
                                     <button class="remove-champion bg-gray-600 text-white rounded-full w-4 h-4 sm:w-5 sm:h-5 flex items-center justify-center text-xs" title="Eliminar campeón">
                                         ×
                                     </button>
-                                </div>
-                                
-                                <div class="cost-badge absolute -bottom-1 sm:-bottom-2 left-1/2 transform -translate-x-1/2 bg-gray-800 bg-opacity-80 rounded-full px-1 py-0.5 sm:px-2 sm:py-1 text-xs sm:text-sm flex items-center">
-                                    <span class="mr-1">🥮</span> {cell.champion.cost}
                                 </div>
                                 
                                 {cell.champion.items && cell.champion.items.length > 0 && (
@@ -117,23 +122,31 @@ for (let row = 0; row < 3; row++) {
                     class="w-full p-2 bg-gray-800 rounded-lg text-white text-sm"
                 />
             </div>
-            <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2" id="champions-list">
+            <div class="champions-list grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 sm:gap-4 p-4" id="champions-list">
                 {champions.map((champion, index) => (
-                    <div
-                        class={`champion-card-grid bg-gray-800 rounded-lg p-1 sm:p-2 cursor-move ${index >= 15 ? 'hidden initial-hidden' : ''}`}
+                    <div 
+                        class={`champion-item relative cursor-pointer group ${index >= 10 ? 'hidden' : ''}`}
                         draggable="true"
                         data-champion-id={champion.id}
+                        data-cost={champion.cost}
+                        class:list={[
+                            "p-2 rounded-lg transition-all duration-200",
+                            {
+                                "bg-gray-800 border-2 border-gray-400": champion.cost === 1,
+                                "bg-gray-800 border-2 border-green-500": champion.cost === 2,
+                                "bg-gray-800 border-2 border-blue-500": champion.cost === 3,
+                                "bg-gray-800 border-2 border-purple-500": champion.cost === 4,
+                                "bg-gray-800 border-2 border-orange-500": champion.cost >= 5
+                            }
+                        ]}
                     >
-                        <div class="flex flex-col items-center h-full relative">
-                            <img 
-                                src={champion.icon} 
-                                alt={champion.name} 
-                                title={champion.name}
-                                class="w-10 h-10 sm:w-16 sm:h-16 rounded-full object-cover object-right"
-                            />
-                            <div class="absolute top-0 right-0 bg-yellow-500 text-black rounded-full w-4 h-4 sm:w-6 sm:h-6 flex items-center justify-center text-xs" title="Costo">
-                                {champion.cost}
-                            </div>
+                        <img 
+                            src={champion.icon} 
+                            alt={champion.name} 
+                            class="w-12 h-12 sm:w-16 sm:h-16 rounded-full object-cover object-right mx-auto"
+                        />
+                        <div class="text-center mt-1">
+                            <p class="text-xs sm:text-sm text-white truncate">{champion.name}</p>
                         </div>
                     </div>
                 ))}
@@ -163,7 +176,7 @@ for (let row = 0; row < 3; row++) {
             <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2" id="items-list">
                 {items.map((item, index) => (
                     <div
-                        class={`item-card bg-gray-800 rounded-lg p-1 sm:p-2 cursor-move ${index >= 10 ? 'hidden initial-hidden' : ''}`}
+                        class={`item-card bg-gray-800 rounded-lg p-1 sm:p-2 cursor-move ${index >= 10 ? 'hidden' : ''}`}
                         draggable="true"
                         data-item-id={item.id}
                     >
@@ -190,7 +203,7 @@ for (let row = 0; row < 3; row++) {
     // Funcionalidad para mostrar más campeones
     const showMoreChampionsBtn = document.getElementById('show-more-champions');
     const hideChampionsBtn = document.getElementById('hide-champions');
-    const hiddenChampions = document.querySelectorAll('#champions-list .initial-hidden');
+    const hiddenChampions = document.querySelectorAll('#champions-list .champion-item:nth-child(n+11)');
     
     if (showMoreChampionsBtn) {
         showMoreChampionsBtn.addEventListener('click', function() {
@@ -199,7 +212,7 @@ for (let row = 0; row < 3; row++) {
             });
             showMoreChampionsBtn.style.display = 'none';
             if (hideChampionsBtn) {
-                hideChampionsBtn.style.display = '';
+                hideChampionsBtn.style.display = 'block';
             }
         });
     }
@@ -210,15 +223,16 @@ for (let row = 0; row < 3; row++) {
                 card.classList.add('hidden');
             });
             if (showMoreChampionsBtn) {
-                showMoreChampionsBtn.style.display = '';
+                showMoreChampionsBtn.style.display = 'block';
             }
+            hideChampionsBtn.style.display = 'none';
         });
     }
     
     // Funcionalidad para mostrar más items
     const showMoreItemsBtn = document.getElementById('show-more-items');
     const hideItemsBtn = document.getElementById('hide-items');
-    const hiddenItems = document.querySelectorAll('#items-list .initial-hidden');
+    const hiddenItems = document.querySelectorAll('#items-list .item-card:nth-child(n+11)');
     
     if (showMoreItemsBtn) {
         showMoreItemsBtn.addEventListener('click', function() {
@@ -227,7 +241,7 @@ for (let row = 0; row < 3; row++) {
             });
             showMoreItemsBtn.style.display = 'none';
             if (hideItemsBtn) {
-                hideItemsBtn.style.display = '';
+                hideItemsBtn.style.display = 'block';
             }
         });
     }
@@ -238,8 +252,9 @@ for (let row = 0; row < 3; row++) {
                 card.classList.add('hidden');
             });
             if (showMoreItemsBtn) {
-                showMoreItemsBtn.style.display = '';
+                showMoreItemsBtn.style.display = 'block';
             }
+            hideItemsBtn.style.display = 'none';
         });
     }
 
@@ -259,13 +274,13 @@ for (let row = 0; row < 3; row++) {
         
         items.forEach(item => {
             const titleAttr = item.querySelector('[title]')?.getAttribute('title')?.toLowerCase() || '';
+            const nameText = item.querySelector('p')?.textContent?.toLowerCase() || '';
             
-            if (titleAttr.includes(searchTerm)) {
-                (item as HTMLElement).style.display = '';
+            if (titleAttr.includes(searchTerm) || nameText.includes(searchTerm)) {
                 item.classList.remove('hidden');
                 visibleCount++;
             } else {
-                (item as HTMLElement).style.display = 'none';
+                item.classList.add('hidden');
             }
         });
         
@@ -278,14 +293,19 @@ for (let row = 0; row < 3; row++) {
             document.getElementById('hide-items');
             
         if (showMoreBtn && hideBtn) {
-            showMoreBtn.style.display = searchTerm ? 'none' : '';
-            hideBtn.style.display = searchTerm ? 'none' : '';
+            if (searchTerm) {
+                showMoreBtn.style.display = 'none';
+                hideBtn.style.display = 'none';
+            } else {
+                showMoreBtn.style.display = 'block';
+                hideBtn.style.display = 'none';
+            }
         }
     }
     
     // Eventos de búsqueda
     championSearch.addEventListener('input', () => {
-        filterElements(championSearch, championsList, 'champion-card-grid');
+        filterElements(championSearch, championsList, 'champion-item');
     });
     
     itemSearch.addEventListener('input', () => {
@@ -294,7 +314,7 @@ for (let row = 0; row < 3; row++) {
     
     // Funcionalidad de arrastrar y soltar
     const board = document.getElementById('board');
-    const championCards = document.querySelectorAll('.champion-card-grid');
+    const championCards = document.querySelectorAll('.champion-item');
     const itemCards = document.querySelectorAll('.item-card');
     const cells = document.querySelectorAll('.hex-cell');
 
@@ -315,7 +335,7 @@ for (let row = 0; row < 3; row++) {
 
     // Corregir la función para seleccionar correctamente los elementos y actualizarla
     function updateChampionsVisualState(): void {
-        const championsList = document.querySelectorAll('.champion-card-grid');
+        const championsList = document.querySelectorAll('.champion-item');
         
         championsList.forEach(card => {
             const championId = card.getAttribute('data-champion-id');
@@ -455,13 +475,22 @@ for (let row = 0; row < 3; row++) {
                 } else {
                     // Si la celda está vacía, crear una nueva tarjeta de campeón
                     const champImg = championCard.querySelector('img');
-                    const champCost = championCard.querySelector('.bg-yellow-500')?.textContent || '1';
+                    const champCost = parseInt(championCard.getAttribute('data-cost') || '1');
                     
                     if (champImg) {
                         const hexContent = cell.querySelector('.hex-content');
                         if (hexContent) {
                             const newChampion = document.createElement('div');
                             newChampion.className = 'champion-card relative';
+                            newChampion.classList.add('border-2');
+                            
+                            // Agregar la clase del borde según el costo
+                            const costClass = champCost === 1 ? 'border-gray-400' :
+                                            champCost === 2 ? 'border-green-500' :
+                                            champCost === 3 ? 'border-blue-500' :
+                                            champCost === 4 ? 'border-purple-500' :
+                                            'border-orange-500';
+                            newChampion.classList.add(costClass);
                             
                             // Copiar la imagen
                             const newImg = document.createElement('img');
@@ -475,11 +504,6 @@ for (let row = 0; row < 3; row++) {
                             const levelDiv = document.createElement('div');
                             levelDiv.className = 'star-level absolute -top-2 sm:-top-5 left-1/2 transform -translate-x-1/2 text-yellow-400 text-xs sm:text-base';
                             levelDiv.textContent = '⭐';
-                            
-                            // Añadir el costo
-                            const costDiv = document.createElement('div');
-                            costDiv.className = 'cost-badge absolute -bottom-1 sm:-bottom-2 left-1/2 transform -translate-x-1/2 bg-gray-800 bg-opacity-80 rounded-full px-1 py-0.5 sm:px-2 sm:py-1 text-xs sm:text-sm flex items-center';
-                            costDiv.innerHTML = `<span class="mr-1">🥮</span> ${champCost}`;
                             
                             // Añadir controles
                             const controlsDiv = document.createElement('div');
@@ -506,7 +530,6 @@ for (let row = 0; row < 3; row++) {
                             
                             newChampion.appendChild(newImg);
                             newChampion.appendChild(levelDiv);
-                            newChampion.appendChild(costDiv);
                             newChampion.appendChild(controlsDiv);
                             hexContent.appendChild(newChampion);
                             
@@ -1084,6 +1107,33 @@ for (let row = 0; row < 3; row++) {
             });
         }
     });
+
+    // Función para mostrar/ocultar campeones
+    function toggleChampions() {
+        const button = document.getElementById('toggle-champions');
+        if (!button) return;
+        
+        const hiddenChampions = document.querySelectorAll('.initial-hidden');
+        const isShowingMore = button.textContent?.includes('Ver más');
+        
+        hiddenChampions.forEach(champion => {
+            if (isShowingMore) {
+                champion.classList.remove('hidden');
+                button.textContent = 'Ver menos';
+            } else {
+                champion.classList.add('hidden');
+                button.textContent = 'Ver más';
+            }
+        });
+    }
+
+    // Agregar el evento al botón cuando el DOM esté listo
+    document.addEventListener('DOMContentLoaded', () => {
+        const toggleButton = document.getElementById('toggle-champions');
+        if (toggleButton) {
+            toggleButton.addEventListener('click', toggleChampions);
+        }
+    });
 </script>
 
 <style>
@@ -1098,7 +1148,7 @@ for (let row = 0; row < 3; row++) {
 
     .board-grid {
         display: grid;
-        grid-template-rows: repeat(3, 90px);
+        grid-template-rows: repeat(4, 90px);
         grid-template-columns: repeat(7, 1fr);
         gap: 10px 5px;
         position: relative;
@@ -1107,14 +1157,36 @@ for (let row = 0; row < 3; row++) {
     }
 
     .hex-cell {
-        width: 90%;
-        height: 85px;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
         position: relative;
-        margin: 0 auto;
-        filter: drop-shadow(0px 0px 0px rgba(255, 255, 255, 1));
+        filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.5));
+        transition: filter 0.3s ease;
+    }
+    
+    .hex-cell:has(.champion-card.border-gray-400) {
+        filter: drop-shadow(0 0 5px rgba(156, 163, 175, 0.5));
+    }
+    
+    .hex-cell:has(.champion-card.border-green-500) {
+        filter: drop-shadow(0 0 5px rgba(34, 197, 94, 0.5));
+    }
+    
+    .hex-cell:has(.champion-card.border-blue-500) {
+        filter: drop-shadow(0 0 5px rgba(59, 130, 246, 0.5));
+    }
+    
+    .hex-cell:has(.champion-card.border-purple-500) {
+        filter: drop-shadow(0 0 5px rgba(168, 85, 247, 0.5));
+    }
+    
+    .hex-cell:has(.champion-card.border-orange-500) {
+        filter: drop-shadow(0 0 5px rgba(249, 115, 22, 0.5));
     }
 
-    /* Fondo del hexágono */
     .hex-cell::before {
         content: '';
         position: absolute;
@@ -1127,7 +1199,6 @@ for (let row = 0; row < 3; row++) {
         transition: background-color 0.2s;
     }
 
-    /* Borde del hexágono */
     .hex-cell::after {
         content: '';
         position: absolute;
@@ -1163,9 +1234,12 @@ for (let row = 0; row < 3; row++) {
         justify-content: center;
     }
 
-    /* Ajustar posición de las filas para el patrón escalonado */
     .board-grid > .hex-cell:nth-child(n+8):nth-child(-n+14) {
-        transform: translateX(50%);
+        transform: translate(50%);
+    }
+
+    .board-grid > .hex-cell:nth-child(n+22):nth-child(-n+28) {
+        transform: translate(50%);
     }
 
     .champion-card {
@@ -1211,7 +1285,6 @@ for (let row = 0; row < 3; row++) {
         transform: scale(1.05);
     }
 
-    /* Estilo para cuando se está arrastrando sobre la celda */
     .hex-cell.drag-over::before {
         background: #3a3c4c;
     }
@@ -1220,19 +1293,17 @@ for (let row = 0; row < 3; row++) {
         box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.7);
     }
 
-    /* Estilos para el toast */
     .transition-opacity {
         transition: opacity 0.3s ease;
     }
     
-    /* Media queries para tablets */
     @media (min-width: 768px) {
         .board-container {
             padding: 20px;
         }
         
         .board-grid {
-            grid-template-rows: repeat(3, 100px);
+            grid-template-rows: repeat(4, 100px);
             gap: 15px 10px;
         }
         
@@ -1241,9 +1312,12 @@ for (let row = 0; row < 3; row++) {
             height: 95px;
         }
         
-        /* Ajustar posición de las filas para el patrón escalonado en tablets */
         .board-grid > .hex-cell:nth-child(n+8):nth-child(-n+14) {
-            transform: translateX(50%);
+            transform: translate(50%);
+        }
+        
+        .board-grid > .hex-cell:nth-child(n+22):nth-child(-n+28) {
+            transform: translate(50%);
         }
         
         .cost-badge {
@@ -1255,14 +1329,13 @@ for (let row = 0; row < 3; row++) {
         }
     }
     
-    /* Media queries para desktop */
     @media (min-width: 1024px) {
         .board-container {
             padding: 30px;
         }
         
         .board-grid {
-            grid-template-rows: repeat(3, 120px);
+            grid-template-rows: repeat(4, 120px);
             gap: 20px 15px;
         }
         
@@ -1271,16 +1344,18 @@ for (let row = 0; row < 3; row++) {
             height: 115px;
         }
         
-        /* Ajustar posición de las filas para el patrón escalonado en desktop */
         .board-grid > .hex-cell:nth-child(n+8):nth-child(-n+14) {
-            transform: translateX(50%);
+            transform: translate(50%);
+        }
+        
+        .board-grid > .hex-cell:nth-child(n+22):nth-child(-n+28) {
+            transform: translate(50%);
         }
     }
     
-    /* Ajustes para pantallas pequeñas */
     @media (max-width: 380px) {
         .board-grid {
-            grid-template-rows: repeat(3, 70px);
+            grid-template-rows: repeat(4, 70px);
             gap: 8px 4px;
         }
         
@@ -1289,13 +1364,41 @@ for (let row = 0; row < 3; row++) {
             height: 65px;
         }
         
-        .cost-badge {
+        .cost-badge, .star-level {
             font-size: 0.6rem;
         }
-        
-        .star-level {
-            font-size: 0.6rem;
-        }
+    }
+
+    .champion-item {
+        transition: all 0.2s ease;
+    }
+    
+    .champion-item:hover {
+        transform: scale(1.05);
+    }
+    
+    .champion-item.border-gray-400 {
+        box-shadow: 0 0 5px rgba(156, 163, 175, 0.5);
+    }
+    
+    .champion-item.border-green-500 {
+        box-shadow: 0 0 5px rgba(34, 197, 94, 0.5);
+    }
+    
+    .champion-item.border-blue-500 {
+        box-shadow: 0 0 5px rgba(59, 130, 246, 0.5);
+    }
+    
+    .champion-item.border-purple-500 {
+        box-shadow: 0 0 5px rgba(168, 85, 247, 0.5);
+    }
+    
+    .champion-item.border-orange-500 {
+        box-shadow: 0 0 5px rgba(249, 115, 22, 0.5);
+    }
+    
+    .initial-hidden {
+        display: none;
     }
 </style>
 
