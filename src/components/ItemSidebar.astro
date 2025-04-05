@@ -1,0 +1,79 @@
+---
+import type { Item } from '../types/tft';
+import { getItems } from '../services/riotApi';
+
+interface Props {
+    // Props del componente si las necesitas
+}
+
+const items = await getItems();
+---
+
+<div class="item-sidebar fixed left-0 top-0 h-full w-16 bg-gray-900 border-r border-gray-700 p-2 flex flex-col items-center gap-2 overflow-y-auto">
+    <div class="items-container flex flex-col gap-2 w-full" id="sidebar-items-container">
+        <!-- Los objetos se agregarán aquí dinámicamente -->
+    </div>
+</div>
+
+<style>
+    .item-sidebar {
+        z-index: 50;
+    }
+
+    .item-sidebar .items-container {
+        min-height: 100%;
+    }
+
+    .item-sidebar img {
+        transition: transform 0.2s;
+    }
+
+    .item-sidebar img:hover {
+        transform: scale(1.1);
+    }
+</style>
+
+<script>
+    const sidebarItemsContainer = document.getElementById('sidebar-items-container');
+    const itemsList = document.getElementById('items-list');
+
+    if (sidebarItemsContainer && itemsList) {
+        // Permitir soltar objetos en la barra lateral
+        sidebarItemsContainer.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            e.dataTransfer!.dropEffect = 'move';
+        });
+
+        sidebarItemsContainer.addEventListener('drop', (e) => {
+            e.preventDefault();
+            const itemId = e.dataTransfer!.getData('text/plain');
+            const itemElement = document.querySelector(`[data-item-id="${itemId}"]`);
+            
+            if (itemElement) {
+                const itemImg = itemElement.querySelector('img');
+                if (itemImg) {
+                    // Crear una copia del objeto en la barra lateral
+                    const newItemImg = document.createElement('img');
+                    newItemImg.src = itemImg.src;
+                    newItemImg.alt = itemImg.alt;
+                    newItemImg.title = itemImg.title;
+                    newItemImg.setAttribute('data-item-id', itemId);
+                    newItemImg.className = 'w-8 h-8 sm:w-10 sm:h-10 object-cover object-right border-2 border-yellow-400 cursor-pointer';
+                    
+                    // Agregar botón para eliminar el objeto
+                    const removeBtn = document.createElement('button');
+                    removeBtn.className = 'absolute -top-1 -right-1 bg-red-600 text-white rounded-full w-4 h-4 flex items-center justify-center text-xs';
+                    removeBtn.textContent = '×';
+                    removeBtn.onclick = () => newItemImg.remove();
+                    
+                    const itemWrapper = document.createElement('div');
+                    itemWrapper.className = 'relative';
+                    itemWrapper.appendChild(newItemImg);
+                    itemWrapper.appendChild(removeBtn);
+                    
+                    sidebarItemsContainer.appendChild(itemWrapper);
+                }
+            }
+        });
+    }
+</script> 

@@ -1,6 +1,7 @@
 ---
 import { getChampions, getItems } from '../services/riotApi';
 import type { Champion, Item, BoardCell } from '../types/tft';
+import ItemSidebar from './ItemSidebar.astro';
 
 const champions = await getChampions();
 const items = await getItems();
@@ -18,183 +19,189 @@ for (let row = 0; row < 4; row++) {
 }
 ---
 
-<div class="max-w-screen-xl mx-auto px-2 sm:px-4">
-    <div class="flex flex-col sm:flex-row justify-between items-center mb-4 gap-2">
-        <h1 class="text-xl sm:text-2xl font-bold">TFT Compositor</h1>
-        <div class="flex flex-wrap justify-center gap-2">
-            <button id="save-comp" class="bg-green-600 hover:bg-green-700 text-white px-2 py-1 sm:px-4 sm:py-2 rounded text-sm sm:text-base">
-                Guardar 💾
-            </button>
-            <button id="download-comp" class="bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 sm:px-4 sm:py-2 rounded text-sm sm:text-base">
-                Exportar 📥
-            </button>
-            <label for="upload-comp" class="bg-purple-600 hover:bg-purple-700 text-white px-2 py-1 sm:px-4 sm:py-2 rounded cursor-pointer text-sm sm:text-base">
-                Importar 📤
-            </label>
-            <input type="file" id="upload-comp" accept=".json" class="hidden" />
-            <button id="clear-comp" class="bg-red-600 hover:bg-red-700 text-white px-2 py-1 sm:px-4 sm:py-2 rounded text-sm sm:text-base">
-                Limpiar 🗑️
-            </button>
-        </div>
-    </div>
-    
-    <div class="board-container">
-        <div class="board-grid" id="board">
-            {board.map((cell) => (
-                <div
-                    class="hex-cell relative"
-                    data-cell-id={cell.id}
-                    data-row={cell.position.row}
-                    data-col={cell.position.col}
-                >
-                    <div class="hex-content">
-                        {cell.champion && (
-                            <div class="champion-card relative" class:list={[
-                                "border-2",
-                                {
-                                    "border-gray-400": cell.champion.cost === 1,
-                                    "border-green-500": cell.champion.cost === 2,
-                                    "border-blue-500": cell.champion.cost === 3,
-                                    "border-purple-500": cell.champion.cost === 4,
-                                    "border-orange-500": cell.champion.cost >= 5
-                                }
-                            ]}>
-                                <img 
-                                    src={cell.champion.icon} 
-                                    alt={cell.champion.name} 
-                                    title={cell.champion.name}
-                                    class="w-10 h-10 sm:w-16 sm:h-16 rounded-full object-cover object-right"
-                                />
-                                <div class="star-level absolute -top-2 sm:-top-5 left-1/2 transform -translate-x-1/2 text-yellow-400 text-xs sm:text-base">
-                                    {'⭐'.repeat(cell.champion.level || 1)}
-                                </div>
-                                
-                                <div class="champion-controls absolute -top-1 sm:-top-1 left-0 right-0 opacity-0 transition-opacity flex justify-center space-x-1 z-10">
-                                    <button class="decrease-level bg-red-600 text-white rounded-full w-4 h-4 sm:w-5 sm:h-5 flex items-center justify-center text-xs" title="Disminuir nivel">
-                                        -
-                                    </button>
-                                    <button class="increase-level bg-green-600 text-white rounded-full w-4 h-4 sm:w-5 sm:h-5 flex items-center justify-center text-xs" title="Aumentar nivel">
-                                        +
-                                    </button>
-                                    <button class="remove-champion bg-gray-600 text-white rounded-full w-4 h-4 sm:w-5 sm:h-5 flex items-center justify-center text-xs" title="Eliminar campeón">
-                                        ×
-                                    </button>
-                                </div>
-                                
-                                {cell.champion.items && cell.champion.items.length > 0 && (
-                                    <div class="items-container absolute -bottom-4 sm:-bottom-8 left-1/2 transform -translate-x-1/2 flex justify-center gap-1">
-                                        {cell.champion.items.map((item) => (
-                                            <img 
-                                                src={item.icon} 
-                                                alt={item.name} 
-                                                title={item.name}
-                                                class="w-4 h-4 sm:w-6 sm:h-6 object-cover object-right border-2 border-yellow-400"
-                                            />
-                                        ))}
+<main class="min-h-screen bg-gray-900 text-white p-4">
+    <ItemSidebar />
+    <div class="ml-16">
+        <div class="max-w-7xl mx-auto">
+            <h1 class="text-2xl sm:text-3xl font-bold text-center mb-4">Compos TFT</h1>
+            <div class="flex flex-col sm:flex-row justify-between items-center mb-4 gap-2">
+                <h1 class="text-xl sm:text-2xl font-bold">TFT Compositor</h1>
+                <div class="flex flex-wrap justify-center gap-2">
+                    <button id="save-comp" class="bg-green-600 hover:bg-green-700 text-white px-2 py-1 sm:px-4 sm:py-2 rounded text-sm sm:text-base">
+                        Guardar 💾
+                    </button>
+                    <button id="download-comp" class="bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 sm:px-4 sm:py-2 rounded text-sm sm:text-base">
+                        Exportar 📥
+                    </button>
+                    <label for="upload-comp" class="bg-purple-600 hover:bg-purple-700 text-white px-2 py-1 sm:px-4 sm:py-2 rounded cursor-pointer text-sm sm:text-base">
+                        Importar 📤
+                    </label>
+                    <input type="file" id="upload-comp" accept=".json" class="hidden" />
+                    <button id="clear-comp" class="bg-red-600 hover:bg-red-700 text-white px-2 py-1 sm:px-4 sm:py-2 rounded text-sm sm:text-base">
+                        Limpiar 🗑️
+                    </button>
+                </div>
+            </div>
+            
+            <div class="board-container">
+                <div class="board-grid" id="board">
+                    {board.map((cell) => (
+                        <div
+                            class="hex-cell relative"
+                            data-cell-id={cell.id}
+                            data-row={cell.position.row}
+                            data-col={cell.position.col}
+                        >
+                            <div class="hex-content">
+                                {cell.champion && (
+                                    <div class="champion-card relative" class:list={[
+                                        "border-2",
+                                        {
+                                            "border-gray-400": cell.champion.cost === 1,
+                                            "border-green-500": cell.champion.cost === 2,
+                                            "border-blue-500": cell.champion.cost === 3,
+                                            "border-purple-500": cell.champion.cost === 4,
+                                            "border-orange-500": cell.champion.cost >= 5
+                                        }
+                                    ]}>
+                                        <img 
+                                            src={cell.champion.icon} 
+                                            alt={cell.champion.name} 
+                                            title={cell.champion.name}
+                                            class="w-10 h-10 sm:w-16 sm:h-16 rounded-full object-cover object-right"
+                                        />
+                                        <div class="star-level absolute -top-2 sm:-top-5 left-1/2 transform -translate-x-1/2 text-yellow-400 text-xs sm:text-base">
+                                            {'⭐'.repeat(cell.champion.level || 1)}
+                                        </div>
+                                        
+                                        <div class="champion-controls absolute -top-1 sm:-top-1 left-0 right-0 opacity-0 transition-opacity flex justify-center space-x-1 z-10">
+                                            <button class="decrease-level bg-red-600 text-white rounded-full w-4 h-4 sm:w-5 sm:h-5 flex items-center justify-center text-xs" title="Disminuir nivel">
+                                                -
+                                            </button>
+                                            <button class="increase-level bg-green-600 text-white rounded-full w-4 h-4 sm:w-5 sm:h-5 flex items-center justify-center text-xs" title="Aumentar nivel">
+                                                +
+                                            </button>
+                                            <button class="remove-champion bg-gray-600 text-white rounded-full w-4 h-4 sm:w-5 sm:h-5 flex items-center justify-center text-xs" title="Eliminar campeón">
+                                                ×
+                                            </button>
+                                        </div>
+                                        
+                                        {cell.champion.items && cell.champion.items.length > 0 && (
+                                            <div class="items-container absolute -bottom-4 sm:-bottom-8 left-1/2 transform -translate-x-1/2 flex justify-center gap-1">
+                                                {cell.champion.items.map((item) => (
+                                                    <img 
+                                                        src={item.icon} 
+                                                        alt={item.name} 
+                                                        title={item.name}
+                                                        class="w-4 h-4 sm:w-6 sm:h-6 object-cover object-right border-2 border-yellow-400"
+                                                    />
+                                                ))}
+                                            </div>
+                                        )}
                                     </div>
                                 )}
                             </div>
-                        )}
-                    </div>
+                        </div>
+                    ))}
                 </div>
-            ))}
-        </div>
-    </div>
+            </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-        <div class="champions-container">
-            <div class="flex justify-between items-center mb-2">
-                <h2 class="text-lg sm:text-xl font-bold">Campeones</h2>
-                <div class="flex space-x-2">
-                    <button id="show-more-champions" class="bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded text-xs sm:text-sm">
-                        Ver más
-                    </button>
-                    <button id="hide-champions" class="bg-gray-600 hover:bg-gray-700 text-white px-2 py-1 rounded text-xs sm:text-sm">
-                        Ver menos
-                    </button>
-                </div>
-            </div>
-            <div class="mb-4">
-                <input 
-                    type="text" 
-                    id="champion-search" 
-                    placeholder="Buscar campeón..." 
-                    class="w-full p-2 bg-gray-800 rounded-lg text-white text-sm"
-                />
-            </div>
-            <div class="champions-list grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 sm:gap-4 p-4" id="champions-list">
-                {champions.map((champion, index) => (
-                    <div 
-                        class={`champion-item relative cursor-pointer group ${index >= 10 ? 'hidden' : ''}`}
-                        draggable="true"
-                        data-champion-id={champion.id}
-                        data-cost={champion.cost}
-                        class:list={[
-                            "p-2 rounded-lg transition-all duration-200",
-                            {
-                                "bg-gray-800 border-2 border-gray-400": champion.cost === 1,
-                                "bg-gray-800 border-2 border-green-500": champion.cost === 2,
-                                "bg-gray-800 border-2 border-blue-500": champion.cost === 3,
-                                "bg-gray-800 border-2 border-purple-500": champion.cost === 4,
-                                "bg-gray-800 border-2 border-orange-500": champion.cost >= 5
-                            }
-                        ]}
-                    >
-                        <img 
-                            src={champion.icon} 
-                            alt={champion.name} 
-                            class="w-12 h-12 sm:w-16 sm:h-16 rounded-full object-cover object-right mx-auto"
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                <div class="champions-container">
+                    <div class="flex justify-between items-center mb-2">
+                        <h2 class="text-lg sm:text-xl font-bold">Campeones</h2>
+                        <div class="flex space-x-2">
+                            <button id="show-more-champions" class="bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded text-xs sm:text-sm">
+                                Ver más
+                            </button>
+                            <button id="hide-champions" class="bg-gray-600 hover:bg-gray-700 text-white px-2 py-1 rounded text-xs sm:text-sm">
+                                Ver menos
+                            </button>
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <input 
+                            type="text" 
+                            id="champion-search" 
+                            placeholder="Buscar campeón..." 
+                            class="w-full p-2 bg-gray-800 rounded-lg text-white text-sm"
                         />
-                        <div class="text-center mt-1">
-                            <p class="text-xs sm:text-sm text-white truncate">{champion.name}</p>
-                        </div>
                     </div>
-                ))}
-            </div>
-        </div>
-
-        <div class="items-container">
-            <div class="flex justify-between items-center mb-2">
-                <h2 class="text-lg sm:text-xl font-bold">Objetos</h2>
-                <div class="flex space-x-2">
-                    <button id="show-more-items" class="bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded text-xs sm:text-sm">
-                        Ver más
-                    </button>
-                    <button id="hide-items" class="bg-gray-600 hover:bg-gray-700 text-white px-2 py-1 rounded text-xs sm:text-sm">
-                        Ver menos
-                    </button>
+                    <div class="champions-list grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 sm:gap-4 p-4" id="champions-list">
+                        {champions.map((champion, index) => (
+                            <div 
+                                class={`champion-item relative cursor-pointer group ${index >= 10 ? 'hidden' : ''}`}
+                                draggable="true"
+                                data-champion-id={champion.id}
+                                data-cost={champion.cost}
+                                class:list={[
+                                    "p-2 rounded-lg transition-all duration-200",
+                                    {
+                                        "bg-gray-800 border-2 border-gray-400": champion.cost === 1,
+                                        "bg-gray-800 border-2 border-green-500": champion.cost === 2,
+                                        "bg-gray-800 border-2 border-blue-500": champion.cost === 3,
+                                        "bg-gray-800 border-2 border-purple-500": champion.cost === 4,
+                                        "bg-gray-800 border-2 border-orange-500": champion.cost >= 5
+                                    }
+                                ]}
+                            >
+                                <img 
+                                    src={champion.icon} 
+                                    alt={champion.name} 
+                                    class="w-12 h-12 sm:w-16 sm:h-16 rounded-full object-cover object-right mx-auto"
+                                />
+                                <div class="text-center mt-1">
+                                    <p class="text-xs sm:text-sm text-white truncate">{champion.name}</p>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
                 </div>
-            </div>
-            <div class="mb-4">
-                <input 
-                    type="text" 
-                    id="item-search" 
-                    placeholder="Buscar objeto..." 
-                    class="w-full p-2 bg-gray-800 rounded-lg text-white text-sm"
-                />
-            </div>
-            <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2" id="items-list">
-                {items.map((item, index) => (
-                    <div
-                        class={`item-card bg-gray-800 rounded-lg p-1 sm:p-2 cursor-move ${index >= 10 ? 'hidden' : ''}`}
-                        draggable="true"
-                        data-item-id={item.id}
-                    >
-                        <div class="flex flex-col items-center h-full relative">
-                            <img 
-                                src={item.icon} 
-                                alt={item.name} 
-                                title={item.name}
-                                class="w-30 h-30 sm:w-20 sm:h-20 object-cover object-right border-2 border-yellow-400"
-                            />
-                            <p class="text-xs mt-1 text-center text-gray-300 truncate w-full">{item.name}</p>
+
+                <div class="items-container">
+                    <div class="flex justify-between items-center mb-2">
+                        <h2 class="text-lg sm:text-xl font-bold">Objetos</h2>
+                        <div class="flex space-x-2">
+                            <button id="show-more-items" class="bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded text-xs sm:text-sm">
+                                Ver más
+                            </button>
+                            <button id="hide-items" class="bg-gray-600 hover:bg-gray-700 text-white px-2 py-1 rounded text-xs sm:text-sm">
+                                Ver menos
+                            </button>
                         </div>
                     </div>
-                ))}
+                    <div class="mb-4">
+                        <input 
+                            type="text" 
+                            id="item-search" 
+                            placeholder="Buscar objeto..." 
+                            class="w-full p-2 bg-gray-800 rounded-lg text-white text-sm"
+                        />
+                    </div>
+                    <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2" id="items-list">
+                        {items.map((item, index) => (
+                            <div
+                                class={`item-card bg-gray-800 rounded-lg p-1 sm:p-2 cursor-move ${index >= 10 ? 'hidden' : ''}`}
+                                draggable="true"
+                                data-item-id={item.id}
+                            >
+                                <div class="flex flex-col items-center h-full relative">
+                                    <img 
+                                        src={item.icon} 
+                                        alt={item.name} 
+                                        title={item.name}
+                                        class="w-30 h-30 sm:w-20 sm:h-20 object-cover object-right border-2 border-yellow-400"
+                                    />
+                                    <p class="text-xs mt-1 text-center text-gray-300 truncate w-full">{item.name}</p>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-</div>
+</main>
 
 <script>
     // Definimos la variable draggedElement al principio del script
