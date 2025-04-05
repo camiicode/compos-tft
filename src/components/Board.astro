@@ -20,10 +20,9 @@ for (let row = 0; row < 4; row++) {
 ---
 
 <main class="min-h-screen bg-gray-900 text-white p-4">
-    <ItemSidebar />
+    
     <div class="ml-16">
         <div class="max-w-7xl mx-auto">
-            <h1 class="text-2xl sm:text-3xl font-bold text-center mb-4">Compos TFT</h1>
             <div class="flex flex-col sm:flex-row justify-between items-center mb-4 gap-2">
                 <h1 class="text-xl sm:text-2xl font-bold">TFT Compositor</h1>
                 <div class="flex flex-wrap justify-center gap-2">
@@ -43,7 +42,8 @@ for (let row = 0; row < 4; row++) {
                 </div>
             </div>
             
-            <div class="board-container">
+            <div class="board-container relative">
+                <ItemSidebar />
                 <div class="board-grid" id="board">
                     {board.map((cell) => (
                         <div
