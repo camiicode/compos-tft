@@ -53,10 +53,14 @@ const getBorderColor = (item: Champion | Item) => {
     <div class="flex justify-between items-center mb-4">
         <h2 class="text-xl font-bold">{title}</h2>
         <div class="flex gap-2">
-            <button class="ver-menos px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+            <button 
+                class="ver-menos px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors hidden"
+            >
                 Ver menos
             </button>
-            <button class="ver-mas px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+            <button 
+                class="ver-mas px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+            >
                 Ver más
             </button>
         </div>
@@ -115,8 +119,6 @@ const getBorderColor = (item: Champion | Item) => {
 </style>
 
 <script define:vars={{ columns, rows, allItems }}>
-    let currentRows = rows;
-    const maxItems = allItems.length;
     let showingAll = false;
 
     const searchInput = document.getElementById('searchInput');
@@ -126,7 +128,6 @@ const getBorderColor = (item: Champion | Item) => {
 
     function updateVisibleItems(searchTerm = '') {
         const itemCards = itemsGrid.querySelectorAll('.item-card');
-        let visibleCount = 0;
         const isSearching = searchTerm.length > 0;
 
         itemCards.forEach(card => {
@@ -134,33 +135,27 @@ const getBorderColor = (item: Champion | Item) => {
             const index = parseInt(card.getAttribute('data-index'));
             const matchesSearch = name.includes(searchTerm.toLowerCase());
             
-            // Si hay búsqueda, mostramos todas las coincidencias
-            // Si no hay búsqueda, mostramos según el estado (todos o limitados)
             const shouldShow = isSearching ? 
                 matchesSearch : 
                 (showingAll ? true : index < (rows * columns));
             
-            if (shouldShow) {
-                card.style.display = '';
-                visibleCount++;
-            } else {
-                card.style.display = 'none';
-            }
+            card.style.display = shouldShow ? '' : 'none';
         });
 
-        // Los botones se deshabilitan durante la búsqueda
+        // Durante la búsqueda, ocultamos ambos botones
         if (isSearching) {
-            verMasBtn.disabled = true;
-            verMenosBtn.disabled = true;
+            verMasBtn.classList.add('hidden');
+            verMenosBtn.classList.add('hidden');
         } else {
-            // Ver más solo se habilita si no estamos mostrando todo
-            verMasBtn.disabled = showingAll;
-            // Ver menos solo se habilita si estamos mostrando todo
-            verMenosBtn.disabled = !showingAll;
+            // Si no hay búsqueda, mostramos solo el botón relevante
+            if (showingAll) {
+                verMasBtn.classList.add('hidden');
+                verMenosBtn.classList.remove('hidden');
+            } else {
+                verMasBtn.classList.remove('hidden');
+                verMenosBtn.classList.add('hidden');
+            }
         }
-
-        verMasBtn.style.opacity = verMasBtn.disabled ? '0.5' : '1';
-        verMenosBtn.style.opacity = verMenosBtn.disabled ? '0.5' : '1';
     }
 
     searchInput.addEventListener('input', (e) => {
