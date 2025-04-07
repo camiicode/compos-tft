@@ -1,19 +1,12 @@
 ---
-import type { Champion } from '../types/tft';
-import { getChampions } from '../services/riotApi';
-import { getItems } from '../services/riotApi';
+import type { Champion, Item } from '../types/tft';
+import { getChampions, getItems } from '../services/riotApi';
 
 interface Props {
     type: 'champions' | 'objects';
     title?: string;
     columns?: number;
     rows?: number;
-}
-
-interface Item {
-    id: string;
-    name: string;
-    icon: string;
 }
 
 const { 
@@ -25,13 +18,11 @@ const {
 
 let allItems: (Champion | Item)[] = [];
 try {
-    if (type === 'champions') {
-        allItems = await getChampions();
-    } else if (type === 'objects') {
-        allItems = await getItems();
-    }
+    allItems = type === 'champions' ? await getChampions() : await getItems();
+    console.log(`Cargados ${allItems.length} ${type}`);
 } catch (error) {
     console.error(`Error al cargar ${type}:`, error);
+    allItems = [];
 }
 
 const getBorderColor = (item: Champion | Item) => {
@@ -47,35 +38,46 @@ const getBorderColor = (item: Champion | Item) => {
     }
     return 'border-gray-400';
 };
+
+// Generar un ID único para esta instancia del componente
+const componentId = `list-${type}-${Math.random().toString(36).substring(2, 9)}`;
 ---
 
-<div class="list-container p-4 bg-gray-800 rounded-lg">
+<div class="list-container p-4 bg-gray-800 rounded-lg w-full" id={componentId}>
     <div class="flex justify-between items-center mb-4">
         <h2 class="text-xl font-bold">{title}</h2>
-        <div class="flex gap-2">
-            <button 
-                class="ver-menos px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors hidden"
-            >
-                Ver menos
-            </button>
-            <button 
-                class="ver-mas px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
-            >
-                Ver más
-            </button>
-        </div>
+        {allItems.length > (columns * rows) && (
+            <div class="flex gap-2">
+                <button 
+                    class="ver-menos px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors hidden"
+                    id={`verMenosBtn-${componentId}`}
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6">
+                        <path fill-rule="evenodd" d="M11.47 7.72a.75.75 0 0 1 1.06 0l7.5 7.5a.75.75 0 1 1-1.06 1.06L12 9.31l-6.97 6.97a.75.75 0 0 1-1.06-1.06l7.5-7.5Z" clip-rule="evenodd" />
+                    </svg>
+                </button>
+                <button 
+                    class="ver-mas px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+                    id={`verMasBtn-${componentId}`}
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6">
+                        <path fill-rule="evenodd" d="M12.53 16.28a.75.75 0 0 1-1.06 0l-7.5-7.5a.75.75 0 0 1 1.06-1.06L12 14.69l6.97-6.97a.75.75 0 1 1 1.06 1.06l-7.5 7.5Z" clip-rule="evenodd" />
+                    </svg>
+                </button>
+            </div>
+        )}
     </div>
 
     <div class="mb-4">
         <input 
             type="text" 
-            placeholder="Buscar..." 
+            placeholder={`Buscar ${type === 'champions' ? 'campeón' : 'objeto'}...`}
             class="w-full px-4 py-2 bg-gray-700 text-white rounded border border-gray-600 focus:outline-none focus:border-blue-500"
-            id="searchInput"
+            id={`searchInput-${componentId}`}
         />
     </div>
 
-    <div class={`grid grid-cols-${columns} gap-4`} style={`grid-template-columns: repeat(${columns}, minmax(0, 1fr));`} id="itemsGrid">
+    <div class="grid gap-4" style={`grid-template-columns: repeat(${columns}, minmax(0, 1fr));`} id={`itemsGrid-${componentId}`}>
         {allItems.map((item: Champion | Item, index) => (
             <div 
                 class={`item-card bg-gray-700 p-2 rounded-lg cursor-pointer hover:bg-gray-600 transition-colors border-2 ${getBorderColor(item)}`}
@@ -90,11 +92,17 @@ const getBorderColor = (item: Champion | Item) => {
                         src={item.icon} 
                         alt={item.name}
                         class="w-10 h-10 rounded-full"
+                        onerror="this.src='https://ddragon.leagueoflegends.com/cdn/13.24.1/img/tft-item/1.png'"
                     />
                     <div>
                         <h3 class="font-semibold">{item.name}</h3>
                         {type === 'champions' && 'cost' in item && (
                             <p class="text-sm text-gray-300">Costo: {item.cost}</p>
+                        )}
+                        {type === 'objects' && 'description' in item && (
+                            <p class="text-sm text-gray-300 truncate max-w-[150px]" title={item.description}>
+                                {item.description}
+                            </p>
                         )}
                     </div>
                 </div>
@@ -118,60 +126,106 @@ const getBorderColor = (item: Champion | Item) => {
     }
 </style>
 
-<script define:vars={{ columns, rows, allItems }}>
-    let showingAll = false;
+<script define:vars={{ columns, rows, type, componentId }}>
+    // Esperar a que el DOM esté completamente cargado
+    document.addEventListener('DOMContentLoaded', function() {
+        let showingAll = false;
+        const searchInput = document.getElementById(`searchInput-${componentId}`);
+        const itemsGrid = document.getElementById(`itemsGrid-${componentId}`);
+        const verMasBtn = document.getElementById(`verMasBtn-${componentId}`);
+        const verMenosBtn = document.getElementById(`verMenosBtn-${componentId}`);
 
-    const searchInput = document.getElementById('searchInput');
-    const itemsGrid = document.getElementById('itemsGrid');
-    const verMasBtn = document.querySelector('.ver-mas');
-    const verMenosBtn = document.querySelector('.ver-menos');
-
-    function updateVisibleItems(searchTerm = '') {
-        const itemCards = itemsGrid.querySelectorAll('.item-card');
-        const isSearching = searchTerm.length > 0;
-
-        itemCards.forEach(card => {
-            const name = card.getAttribute('data-name');
-            const index = parseInt(card.getAttribute('data-index'));
-            const matchesSearch = name.includes(searchTerm.toLowerCase());
-            
-            const shouldShow = isSearching ? 
-                matchesSearch : 
-                (showingAll ? true : index < (rows * columns));
-            
-            card.style.display = shouldShow ? '' : 'none';
+        console.log(`Inicializando ListPropsForMyComposition para ${type} con ID ${componentId}`);
+        console.log(`Elementos encontrados para ${type}:`, {
+            searchInput: !!searchInput,
+            itemsGrid: !!itemsGrid,
+            verMasBtn: !!verMasBtn,
+            verMenosBtn: !!verMenosBtn
         });
 
-        // Durante la búsqueda, ocultamos ambos botones
-        if (isSearching) {
-            verMasBtn.classList.add('hidden');
-            verMenosBtn.classList.add('hidden');
-        } else {
-            // Si no hay búsqueda, mostramos solo el botón relevante
-            if (showingAll) {
+        function updateVisibleItems(searchTerm = '') {
+            if (!itemsGrid || !verMasBtn || !verMenosBtn) {
+                console.error(`Elementos necesarios no encontrados para ${type}`);
+                return;
+            }
+            
+            const isSearching = searchTerm.length > 0;
+            console.log(`Actualizando elementos visibles para ${type}. Búsqueda: "${searchTerm}", isSearching: ${isSearching}, showingAll: ${showingAll}`);
+            
+            const itemCards = Array.from(itemsGrid.querySelectorAll('.item-card'));
+            console.log(`Total de tarjetas encontradas para ${type}: ${itemCards.length}`);
+            
+            let visibleCount = 0;
+            
+            itemCards.forEach(card => {
+                if (card instanceof HTMLElement) {
+                    const name = card.getAttribute('data-name') || '';
+                    const index = parseInt(card.getAttribute('data-index') || '0');
+                    const matchesSearch = name.toLowerCase().includes(searchTerm.toLowerCase());
+                    
+                    if (isSearching) {
+                        // Durante la búsqueda, mostrar todos los elementos que coincidan
+                        card.style.display = matchesSearch ? '' : 'none';
+                        if (matchesSearch) visibleCount++;
+                    } else {
+                        // Sin búsqueda, mostrar según el estado de showingAll
+                        card.style.display = showingAll || index < (rows * columns) ? '' : 'none';
+                        if (showingAll || index < (rows * columns)) visibleCount++;
+                    }
+                }
+            });
+            
+            console.log(`Elementos visibles para ${type}: ${visibleCount}`);
+            
+            // Actualizar visibilidad de botones
+            if (isSearching) {
+                // Durante la búsqueda, ocultar ambos botones
                 verMasBtn.classList.add('hidden');
-                verMenosBtn.classList.remove('hidden');
-            } else {
-                verMasBtn.classList.remove('hidden');
                 verMenosBtn.classList.add('hidden');
+            } else {
+                // Sin búsqueda, mostrar según el estado de showingAll
+                if (showingAll) {
+                    verMasBtn.classList.add('hidden');
+                    verMenosBtn.classList.remove('hidden');
+                } else {
+                    verMasBtn.classList.remove('hidden');
+                    verMenosBtn.classList.add('hidden');
+                }
             }
         }
-    }
 
-    searchInput.addEventListener('input', (e) => {
-        updateVisibleItems(e.target.value);
+        // Asegurarse de que los elementos existan antes de agregar eventos
+        if (searchInput && verMasBtn && verMenosBtn) {
+            console.log(`Inicializando eventos para búsqueda y botones de ${type}`);
+            
+            searchInput.addEventListener('input', (event) => {
+                const input = event.target;
+                if (input instanceof HTMLInputElement) {
+                    console.log(`Búsqueda para ${type}: "${input.value}"`);
+                    updateVisibleItems(input.value);
+                }
+            });
+
+            verMasBtn.addEventListener('click', () => {
+                console.log(`Botón Ver más clickeado para ${type}`);
+                showingAll = true;
+                updateVisibleItems(searchInput instanceof HTMLInputElement ? searchInput.value : '');
+            });
+
+            verMenosBtn.addEventListener('click', () => {
+                console.log(`Botón Ver menos clickeado para ${type}`);
+                showingAll = false;
+                updateVisibleItems(searchInput instanceof HTMLInputElement ? searchInput.value : '');
+            });
+
+            // Inicialización
+            console.log(`Inicializando estado inicial para ${type}`);
+            updateVisibleItems();
+        } else {
+            console.error(`No se pudieron encontrar todos los elementos necesarios para ${type}`);
+            if (!searchInput) console.error(`No se encontró el campo de búsqueda para ${type}`);
+            if (!verMasBtn) console.error(`No se encontró el botón Ver más para ${type}`);
+            if (!verMenosBtn) console.error(`No se encontró el botón Ver menos para ${type}`);
+        }
     });
-
-    verMasBtn.addEventListener('click', () => {
-        showingAll = true;
-        updateVisibleItems(searchInput.value);
-    });
-
-    verMenosBtn.addEventListener('click', () => {
-        showingAll = false;
-        updateVisibleItems(searchInput.value);
-    });
-
-    // Inicialización
-    updateVisibleItems();
 </script> 

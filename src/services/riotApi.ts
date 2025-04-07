@@ -177,6 +177,7 @@ export async function getChampions(): Promise<Champion[]> {
 }
 
 export async function getItems(): Promise<Item[]> {
+    console.log('Obteniendo items...');
     try {
         // Intentamos obtener los items de Data Dragon
         const response = await axios.get(`${DDragon_URL}/tft-item.json`);
@@ -186,10 +187,11 @@ export async function getItems(): Promise<Item[]> {
         const items: Item[] = Object.values(itemsData).map((item: any) => ({
             id: item.id,
             name: item.name,
-            description: "Descripción del item",
+            description: item.description || 'Sin descripción',
             icon: `${DDragon_IMG_URL}/tft-item/${item.image.full}` // URL de la imagen
         }));
         
+        console.log(`Se obtuvieron ${items.length} items de la API`);
         return items;
     } catch (error) {
         console.error('Error fetching items from API:', error);
@@ -199,53 +201,96 @@ export async function getItems(): Promise<Item[]> {
             {
                 id: "1",
                 name: "B.F. Sword",
-                description: "+10 Attack Damage",
-                icon: "https://ddragon.leagueoflegends.com/cdn/13.24.1/img/item/1001.png"
+                description: "Aumenta el daño de ataque",
+                icon: "https://ddragon.leagueoflegends.com/cdn/13.24.1/img/tft-item/1.png"
             },
             {
                 id: "2",
                 name: "Recurve Bow",
-                description: "+10% Attack Speed",
-                icon: "https://ddragon.leagueoflegends.com/cdn/13.24.1/img/item/1043.png"
+                description: "Aumenta la velocidad de ataque",
+                icon: "https://ddragon.leagueoflegends.com/cdn/13.24.1/img/tft-item/2.png"
             },
             {
                 id: "3",
                 name: "Needlessly Large Rod",
-                description: "+10 Ability Power",
-                icon: "https://ddragon.leagueoflegends.com/cdn/13.24.1/img/item/1058.png"
+                description: "Aumenta el poder de habilidad",
+                icon: "https://ddragon.leagueoflegends.com/cdn/13.24.1/img/tft-item/3.png"
             },
             {
                 id: "4",
                 name: "Tear of the Goddess",
-                description: "+15 Mana",
-                icon: "https://ddragon.leagueoflegends.com/cdn/13.24.1/img/item/3070.png"
+                description: "Aumenta el maná",
+                icon: "https://ddragon.leagueoflegends.com/cdn/13.24.1/img/tft-item/4.png"
             },
             {
                 id: "5",
                 name: "Chain Vest",
-                description: "+20 Armor",
-                icon: "https://ddragon.leagueoflegends.com/cdn/13.24.1/img/item/1031.png"
+                description: "Aumenta la armadura",
+                icon: "https://ddragon.leagueoflegends.com/cdn/13.24.1/img/tft-item/5.png"
             },
             {
                 id: "6",
                 name: "Negatron Cloak",
-                description: "+20 Magic Resist",
-                icon: "https://ddragon.leagueoflegends.com/cdn/13.24.1/img/item/1057.png"
+                description: "Aumenta la resistencia mágica",
+                icon: "https://ddragon.leagueoflegends.com/cdn/13.24.1/img/tft-item/6.png"
             },
             {
                 id: "7",
                 name: "Giant's Belt",
-                description: "+150 Health",
-                icon: "https://ddragon.leagueoflegends.com/cdn/13.24.1/img/item/1011.png"
+                description: "Aumenta la vida",
+                icon: "https://ddragon.leagueoflegends.com/cdn/13.24.1/img/tft-item/7.png"
             },
             {
                 id: "8",
                 name: "Spatula",
-                description: "Componente especial para crear items únicos",
-                icon: "https://ddragon.leagueoflegends.com/cdn/13.24.1/img/item/3311.png"
+                description: "Es un objeto misterioso...",
+                icon: "https://ddragon.leagueoflegends.com/cdn/13.24.1/img/tft-item/8.png"
+            },
+            {
+                id: "9",
+                name: "Infinity Edge",
+                description: "Aumenta el daño crítico",
+                icon: "https://ddragon.leagueoflegends.com/cdn/13.24.1/img/tft-item/9.png"
+            },
+            {
+                id: "10",
+                name: "Rabadon's Deathcap",
+                description: "Aumenta significativamente el poder de habilidad",
+                icon: "https://ddragon.leagueoflegends.com/cdn/13.24.1/img/tft-item/10.png"
+            },
+            {
+                id: "11",
+                name: "Guardian Angel",
+                description: "Revive al portador",
+                icon: "https://ddragon.leagueoflegends.com/cdn/13.24.1/img/tft-item/11.png"
+            },
+            {
+                id: "12",
+                name: "Bloodthirster",
+                description: "Aumenta el daño y la vida robada",
+                icon: "https://ddragon.leagueoflegends.com/cdn/13.24.1/img/tft-item/12.png"
+            },
+            {
+                id: "13",
+                name: "Spear of Shojin",
+                description: "Aumenta el daño y la regeneración de maná",
+                icon: "https://ddragon.leagueoflegends.com/cdn/13.24.1/img/tft-item/13.png"
+            },
+            {
+                id: "14",
+                name: "Statikk Shiv",
+                description: "Aumenta la velocidad de ataque y el daño mágico",
+                icon: "https://ddragon.leagueoflegends.com/cdn/13.24.1/img/tft-item/14.png"
+            },
+            {
+                id: "15",
+                name: "Rapid Firecannon",
+                description: "Aumenta significativamente la velocidad de ataque",
+                icon: "https://ddragon.leagueoflegends.com/cdn/13.24.1/img/tft-item/15.png"
             }
         ];
         
+        console.log(`Usando ${mockItems.length} items mockeados`);
         return mockItems;
     }
 } 

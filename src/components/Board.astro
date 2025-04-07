@@ -95,97 +95,6 @@ for (let row = 0; row < 4; row++) {
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-                <!-- <div class="champions-container">
-                    <div class="flex justify-between items-center mb-2">
-                        <h2 class="text-lg sm:text-xl font-bold">Campeones</h2>
-                        <div class="flex space-x-2">
-                            <button id="show-more-champions" class="bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded text-xs sm:text-sm">
-                                Ver más
-                            </button>
-                            <button id="hide-champions" class="bg-gray-600 hover:bg-gray-700 text-white px-2 py-1 rounded text-xs sm:text-sm">
-                                Ver menos
-                            </button>
-                        </div>
-                    </div>
-                    <div class="mb-4">
-                        <input 
-                            type="text" 
-                            id="champion-search" 
-                            placeholder="Buscar campeón..." 
-                            class="w-full p-2 bg-gray-800 rounded-lg text-white text-sm"
-                        />
-                    </div>
-                    <div class="champions-list grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 sm:gap-4 p-4" id="champions-list">
-                        {champions.map((champion, index) => (
-                            <div 
-                                class={`champion-item relative cursor-pointer group ${index >= 10 ? 'hidden' : ''}`}
-                                draggable="true"
-                                data-champion-id={champion.id}
-                                data-cost={champion.cost}
-                                class:list={[
-                                    "p-2 rounded-lg transition-all duration-200",
-                                    {
-                                        "bg-gray-800 border-2 border-gray-400": champion.cost === 1,
-                                        "bg-gray-800 border-2 border-green-500": champion.cost === 2,
-                                        "bg-gray-800 border-2 border-blue-500": champion.cost === 3,
-                                        "bg-gray-800 border-2 border-purple-500": champion.cost === 4,
-                                        "bg-gray-800 border-2 border-orange-500": champion.cost >= 5
-                                    }
-                                ]}
-                            >
-                                <img 
-                                    src={champion.icon} 
-                                    alt={champion.name} 
-                                    class="w-12 h-12 sm:w-16 sm:h-16 rounded-full object-cover object-right mx-auto"
-                                />
-                                <div class="text-center mt-1">
-                                    <p class="text-xs sm:text-sm text-white truncate">{champion.name}</p>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-
-                <div class="items-container">
-                    <div class="flex justify-between items-center mb-2">
-                        <h2 class="text-lg sm:text-xl font-bold">Objetos</h2>
-                        <div class="flex space-x-2">
-                            <button id="show-more-items" class="bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded text-xs sm:text-sm">
-                                Ver más
-                            </button>
-                            <button id="hide-items" class="bg-gray-600 hover:bg-gray-700 text-white px-2 py-1 rounded text-xs sm:text-sm">
-                                Ver menos
-                            </button>
-                        </div>
-                    </div>
-                    <div class="mb-4">
-                        <input 
-                            type="text" 
-                            id="item-search" 
-                            placeholder="Buscar objeto..." 
-                            class="w-full p-2 bg-gray-800 rounded-lg text-white text-sm"
-                        />
-                    </div>
-                    <div class="champions-list grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 sm:gap-4 p-4 h-[108px]" id="items-list">
-                        {items.map((item, index) => (
-                            <div
-                                class={`item-card bg-gray-800 rounded-lg p-1 sm:p-2 cursor-move ${index >= 10 ? 'hidden' : ''}`}
-                                draggable="true"
-                                data-item-id={item.id}
-                            >
-                                <div class="flex flex-col items-center h-full relative">
-                                    <img 
-                                        src={item.icon} 
-                                        alt={item.name} 
-                                        title={item.name}
-                                        class="w-12 h-12 sm:w-16 sm:h-16 rounded-full object-cover object-right mx-auto"
-                                    />
-                                    <p class="flex content-center items-center h-full text-xs text-white wrap text-center text-[12px] w-[75%] m-auto overflow-hidden text-ellipsis">{item.name}</p>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </div> -->
 
                 <ListPropsForMyCompositions
                     title="Campeones"
@@ -194,949 +103,163 @@ for (let row = 0; row < 4; row++) {
                     rows={2}
                 />
 
+                <ListPropsForMyCompositions
+                    title="Objetos"
+                    type="objects"
+                    columns={5}
+                    rows={2}
+                />
             </div>
         </div>
     </div>
 </main>
 
 <script>
-    // Definimos la variable draggedElement al principio del script
-    let draggedElement: Element | null = null;
+    // Encapsulamos todo en una función para evitar conflictos globales
+    (function initializeBoard() {
+        // Variables locales al scope de la función
+        const boardElement = document.getElementById('board');
+        const boardChampionCards = document.querySelectorAll('#board .champion-item');
+        const boardItemCards = document.querySelectorAll('#board .item-card');
+        const boardCells = document.querySelectorAll('#board .hex-cell');
 
-    // Funcionalidad para mostrar más campeones
-    const showMoreChampionsBtn = document.getElementById('show-more-champions');
-    const hideChampionsBtn = document.getElementById('hide-champions');
-    const hiddenChampions = document.querySelectorAll('#champions-list .champion-item:nth-child(n+11)');
-    
-    if (showMoreChampionsBtn) {
-        showMoreChampionsBtn.addEventListener('click', function() {
-            hiddenChampions.forEach(card => {
-                card.classList.remove('hidden');
-            });
-            showMoreChampionsBtn.style.display = 'none';
-            if (hideChampionsBtn) {
-                hideChampionsBtn.style.display = 'block';
-            }
-        });
-    }
-    
-    if (hideChampionsBtn) {
-        hideChampionsBtn.addEventListener('click', function() {
-            hiddenChampions.forEach(card => {
-                card.classList.add('hidden');
-            });
-            if (showMoreChampionsBtn) {
-                showMoreChampionsBtn.style.display = 'block';
-            }
-            hideChampionsBtn.style.display = 'none';
-        });
-    }
-    
-    // Funcionalidad para mostrar más items
-    const showMoreItemsBtn = document.getElementById('show-more-items');
-    const hideItemsBtn = document.getElementById('hide-items');
-    const hiddenItems = document.querySelectorAll('#items-list .item-card:nth-child(n+11)');
-    
-    if (showMoreItemsBtn) {
-        showMoreItemsBtn.addEventListener('click', function() {
-            hiddenItems.forEach(card => {
-                card.classList.remove('hidden');
-            });
-            showMoreItemsBtn.style.display = 'none';
-            if (hideItemsBtn) {
-                hideItemsBtn.style.display = 'block';
-            }
-        });
-    }
-    
-    if (hideItemsBtn) {
-        hideItemsBtn.addEventListener('click', function() {
-            hiddenItems.forEach(card => {
-                card.classList.add('hidden');
-            });
-            if (showMoreItemsBtn) {
-                showMoreItemsBtn.style.display = 'block';
-            }
-            hideItemsBtn.style.display = 'none';
-        });
-    }
-
-    // Funcionalidad de búsqueda
-    const championSearch = document.getElementById('champion-search') as HTMLInputElement;
-    const itemSearch = document.getElementById('item-search') as HTMLInputElement;
-    const championsList = document.getElementById('champions-list');
-    const itemsList = document.getElementById('items-list');
-    
-    // Función para filtrar elementos
-    function filterElements(searchInput: HTMLInputElement, listElement: HTMLElement | null, itemClass: string) {
-        if (!searchInput || !listElement) return;
-        
-        const searchTerm = searchInput.value.toLowerCase();
-        const items = listElement.querySelectorAll(`.${itemClass}`);
-        let visibleCount = 0;
-        
-        items.forEach(item => {
-            const titleAttr = item.querySelector('[title]')?.getAttribute('title')?.toLowerCase() || '';
-            const nameText = item.querySelector('p')?.textContent?.toLowerCase() || '';
-            
-            if (titleAttr.includes(searchTerm) || nameText.includes(searchTerm)) {
-                item.classList.remove('hidden');
-                visibleCount++;
-            } else {
-                item.classList.add('hidden');
-            }
-        });
-        
-        // Si hay búsqueda, ocultar los botones de mostrar/ocultar
-        const showMoreBtn = listElement.id === 'champions-list' ? 
-            document.getElementById('show-more-champions') : 
-            document.getElementById('show-more-items');
-        const hideBtn = listElement.id === 'champions-list' ? 
-            document.getElementById('hide-champions') : 
-            document.getElementById('hide-items');
-            
-        if (showMoreBtn && hideBtn) {
-            if (searchTerm) {
-                showMoreBtn.style.display = 'none';
-                hideBtn.style.display = 'none';
-            } else {
-                showMoreBtn.style.display = 'block';
-                hideBtn.style.display = 'none';
-            }
-        }
-    }
-    
-    // Eventos de búsqueda
-    championSearch.addEventListener('input', () => {
-        filterElements(championSearch, championsList, 'champion-item');
-    });
-    
-    itemSearch.addEventListener('input', () => {
-        filterElements(itemSearch, itemsList, 'item-card');
-    });
-    
-    // Funcionalidad de arrastrar y soltar
-    const board = document.getElementById('board');
-    const championCards = document.querySelectorAll('.champion-item');
-    const itemCards = document.querySelectorAll('.item-card');
-    const cells = document.querySelectorAll('.hex-cell');
-
-    // Corregir la función para incluir el tipo de parámetro
-    function isChampionOnBoard(championId: string): boolean {
-        const boardCells = document.querySelectorAll('.hex-content');
-        for (const cell of boardCells) {
-            const championCard = cell.querySelector('.champion-card');
-            if (championCard) {
-                const img = championCard.querySelector('img');
-                if (img && img.getAttribute('data-champion-id') === championId) {
-                    return true;
+        function isChampionOnBoard(championId: string): boolean {
+            const boardCells = document.querySelectorAll('#board .hex-content');
+            for (const cell of boardCells) {
+                const championCard = cell.querySelector('.champion-card');
+                if (championCard) {
+                    const img = championCard.querySelector('img');
+                    if (img && img.getAttribute('data-champion-id') === championId) {
+                        return true;
+                    }
                 }
             }
+            return false;
         }
-        return false;
-    }
 
-    // Corregir la función para seleccionar correctamente los elementos y actualizarla
-    function updateChampionsVisualState(): void {
-        const championsList = document.querySelectorAll('.champion-item');
-        
-        championsList.forEach(card => {
-            const championId = card.getAttribute('data-champion-id');
-            if (championId && isChampionOnBoard(championId)) {
-                card.classList.add('opacity-50');
-                card.setAttribute('data-on-board', 'true');
-                // Desactivar el drag para campeones en tablero
-                card.setAttribute('draggable', 'false');
-            } else {
-                card.classList.remove('opacity-50');
-                card.removeAttribute('data-on-board');
-                card.setAttribute('draggable', 'true');
-            }
-        });
-    }
-
-    // Eventos para campeones
-    championCards.forEach(card => {
-        card.addEventListener('dragstart', function(e: Event) {
-            const dragEvent = e as DragEvent;
-            // Comprobar si ya está en el tablero
-            const championId = card.getAttribute('data-champion-id');
-            if (championId && isChampionOnBoard(championId)) {
-                dragEvent.preventDefault();
-                showToast('Este campeón ya está en el tablero', true);
-                return;
-            }
+        function updateChampionsVisualState(): void {
+            const championsList = document.querySelectorAll('#board .champion-item');
             
-            if (dragEvent.dataTransfer) {
-                dragEvent.dataTransfer.setData('text/plain', championId || '');
-                card.classList.add('opacity-50');
-            }
-        });
-
-        card.addEventListener('dragend', function() {
-            card.classList.remove('opacity-50');
-        });
-    });
-
-    // Eventos para items
-    itemCards.forEach(card => {
-        card.addEventListener('dragstart', function(e: Event) {
-            const dragEvent = e as DragEvent;
-            if (dragEvent.dataTransfer) {
-                dragEvent.dataTransfer.setData('text/plain', card.getAttribute('data-item-id') || '');
-                card.classList.add('opacity-50');
-            }
-        });
-
-        card.addEventListener('dragend', function() {
-            card.classList.remove('opacity-50');
-        });
-    });
-
-    // Función para gestionar los controles del campeón
-    function setupChampionControls(championCard: Element) {
-        const increaseBtn = championCard.querySelector('.increase-level');
-        const decreaseBtn = championCard.querySelector('.decrease-level');
-        const removeBtn = championCard.querySelector('.remove-champion');
-        const levelElement = championCard.querySelector('.star-level');
-        
-        if (increaseBtn && levelElement) {
-            increaseBtn.addEventListener('click', function(e) {
-                e.stopPropagation();
-                const starsText = levelElement.textContent || '⭐';
-                const currentLevel = starsText.length;
-                if (currentLevel < 3) {
-                    levelElement.textContent = '⭐'.repeat(currentLevel + 1);
-                }
-            });
-        }
-        
-        if (decreaseBtn && levelElement) {
-            decreaseBtn.addEventListener('click', function(e) {
-                e.stopPropagation();
-                const starsText = levelElement.textContent || '⭐';
-                const currentLevel = starsText.length;
-                if (currentLevel > 1) {
-                    levelElement.textContent = '⭐'.repeat(currentLevel - 1);
-                }
-            });
-        }
-        
-        if (removeBtn) {
-            removeBtn.addEventListener('click', function(e) {
-                e.stopPropagation();
-                const hexContent = championCard.closest('.hex-content');
-                if (hexContent) {
-                    hexContent.innerHTML = '';
-                    // Actualizar el estado visual después de eliminar
-                    updateChampionsVisualState();
-                }
-            });
-        }
-    }
-
-    // Actualizar los eventos de las celdas
-    cells.forEach(cell => {
-        cell.addEventListener('dragover', function(e: Event) {
-            e.preventDefault();
-            cell.classList.add('drag-over');
-        });
-
-        cell.addEventListener('dragleave', function() {
-            cell.classList.remove('drag-over');
-        });
-
-        cell.addEventListener('drop', function(e: Event) {
-            e.preventDefault();
-            cell.classList.remove('drag-over');
-            
-            const dropEvent = e as DragEvent;
-            if (!dropEvent.dataTransfer) return;
-            
-            const id = dropEvent.dataTransfer.getData('text/plain');
-            const championCard = document.querySelector(`[data-champion-id="${id}"]`);
-            const itemCard = document.querySelector(`[data-item-id="${id}"]`);
-
-            if (championCard) {
-                // Verificar si el campeón ya está en el tablero
-                const championId = championCard.getAttribute('data-champion-id');
+            championsList.forEach(card => {
+                const championId = card.getAttribute('data-champion-id');
                 if (championId && isChampionOnBoard(championId)) {
+                    card.classList.add('opacity-50');
+                    card.setAttribute('data-on-board', 'true');
+                    card.setAttribute('draggable', 'false');
+                } else {
+                    card.classList.remove('opacity-50');
+                    card.removeAttribute('data-on-board');
+                    card.setAttribute('draggable', 'true');
+                }
+            });
+        }
+
+        // Eventos para campeones del tablero
+        boardChampionCards.forEach(card => {
+            card.addEventListener('dragstart', function(e: Event) {
+                const dragEvent = e as DragEvent;
+                const championId = card.getAttribute('data-champion-id');
+                if (championId && isChampionOnBoard(championId)) {
+                    dragEvent.preventDefault();
                     return;
                 }
                 
-                // Si ya hay un campeón en la celda, incrementar su nivel
-                const existingChampion = cell.querySelector('.champion-card');
-                if (existingChampion) {
-                    const levelElement = existingChampion.querySelector('.star-level');
-                    if (levelElement) {
-                        const starsText = levelElement.textContent || '⭐';
-                        const currentLevel = starsText.length;
-                        if (currentLevel < 3) {
-                            levelElement.textContent = '⭐'.repeat(currentLevel + 1);
-                        }
-                    }
-                } else {
-                    // Si la celda está vacía, crear una nueva tarjeta de campeón
-                    const champImg = championCard.querySelector('img');
-                    const champCost = parseInt(championCard.getAttribute('data-cost') || '1');
-                    
-                    if (champImg) {
-                        const hexContent = cell.querySelector('.hex-content');
-                        if (hexContent) {
-                            const newChampion = document.createElement('div');
-                            newChampion.className = 'champion-card relative';
-                            newChampion.classList.add('border-2');
-                            
-                            // Agregar la clase del borde según el costo
-                            const costClass = champCost === 1 ? 'border-gray-400' :
-                                            champCost === 2 ? 'border-green-500' :
-                                            champCost === 3 ? 'border-blue-500' :
-                                            champCost === 4 ? 'border-purple-500' :
-                                            'border-orange-500';
-                            newChampion.classList.add(costClass);
-                            
-                            // Copiar la imagen
-                            const newImg = document.createElement('img');
-                            newImg.src = champImg.src;
-                            newImg.alt = champImg.alt;
-                            newImg.title = champImg.title;
-                            newImg.className = 'w-10 h-10 sm:w-16 sm:h-16 rounded-full object-cover object-right';
-                            newImg.setAttribute('data-champion-id', championCard.getAttribute('data-champion-id') || '');
-                            
-                            // Añadir las estrellas
-                            const levelDiv = document.createElement('div');
-                            levelDiv.className = 'star-level absolute -top-2 sm:-top-5 left-1/2 transform -translate-x-1/2 text-yellow-400 text-xs sm:text-base';
-                            levelDiv.textContent = '⭐';
-                            
-                            // Añadir controles
-                            const controlsDiv = document.createElement('div');
-                            controlsDiv.className = 'champion-controls absolute -top-1 sm:-top-1 left-0 right-0 opacity-0 transition-opacity flex justify-center space-x-1 z-10';
-                            
-                            const decreaseBtn = document.createElement('button');
-                            decreaseBtn.className = 'decrease-level bg-red-600 text-white rounded-full w-4 h-4 sm:w-5 sm:h-5 flex items-center justify-center text-xs';
-                            decreaseBtn.title = 'Disminuir nivel';
-                            decreaseBtn.textContent = '-';
-                            
-                            const increaseBtn = document.createElement('button');
-                            increaseBtn.className = 'increase-level bg-green-600 text-white rounded-full w-4 h-4 sm:w-5 sm:h-5 flex items-center justify-center text-xs';
-                            increaseBtn.title = 'Aumentar nivel';
-                            increaseBtn.textContent = '+';
-                            
-                            const removeBtn = document.createElement('button');
-                            removeBtn.className = 'remove-champion bg-gray-600 text-white rounded-full w-4 h-4 sm:w-5 sm:h-5 flex items-center justify-center text-xs';
-                            removeBtn.title = 'Eliminar campeón';
-                            removeBtn.textContent = '×';
-                            
-                            controlsDiv.appendChild(decreaseBtn);
-                            controlsDiv.appendChild(increaseBtn);
-                            controlsDiv.appendChild(removeBtn);
-                            
-                            newChampion.appendChild(newImg);
-                            newChampion.appendChild(levelDiv);
-                            newChampion.appendChild(controlsDiv);
-                            hexContent.appendChild(newChampion);
-                            
-                            // Configurar los controles del nuevo campeón
-                            setupChampionControls(newChampion);
-                        }
-                    }
+                if (dragEvent.dataTransfer) {
+                    dragEvent.dataTransfer.setData('text/plain', championId || '');
+                    card.classList.add('opacity-50');
                 }
-            } else if (itemCard) {
-                // Agregar item al campeón si hay uno en la celda
-                const championCard = cell.querySelector('.champion-card');
-                if (championCard) {
-                    const itemImg = itemCard.querySelector('img');
-                    if (itemImg) {
-                        const itemsContainer = championCard.querySelector('.items-container') || 
-                            document.createElement('div');
-                            
-                        if (!itemsContainer.classList.contains('items-container')) {
-                            itemsContainer.className = 'items-container absolute -bottom-4 sm:-bottom-8 left-1/2 transform -translate-x-1/2 flex justify-center gap-1';
-                            championCard.appendChild(itemsContainer);
-                        }
-                        
-                        // Limitar a 3 objetos máximo
-                        const currentItems = itemsContainer.querySelectorAll('img');
-                        if (currentItems.length < 3) {
-                            // Copiar la imagen del item
-                            const newItemImg = document.createElement('img');
-                            newItemImg.src = itemImg.src;
-                            newItemImg.alt = itemImg.alt;
-                            newItemImg.title = itemImg.title;
-                            newItemImg.className = 'w-4 h-4 sm:w-6 sm:h-6 object-cover object-right border-2 border-yellow-400';
-                            
-                            itemsContainer.appendChild(newItemImg);
-                        }
-                    }
-                }
-            }
-            
-            // Después de añadir el campeón, actualizar el estado visual
-            updateChampionsVisualState();
-        });
-    });
-    
-    // Configurar eventos para los botones de control del campeón para cada campeón existente
-    document.querySelectorAll('.champion-card').forEach(championCard => {
-        setupChampionControls(championCard);
-    });
-    
-    // Mostrar controles al hacer hover
-    document.addEventListener('mouseover', function(e) {
-        const target = e.target as Element;
-        const championCard = target.closest('.champion-card');
-        if (championCard) {
-            const controls = championCard.querySelector('.champion-controls');
-            if (controls) {
-                (controls as HTMLElement).style.opacity = '1';
-            }
-        }
-    });
-    
-    document.addEventListener('mouseout', function(e) {
-        const target = e.target as Element;
-        const championCard = target.closest('.champion-card');
-        if (championCard) {
-            const controls = championCard.querySelector('.champion-controls');
-            if (controls) {
-                (controls as HTMLElement).style.opacity = '0';
-            }
-        }
-    });
-
-    // Estructura para almacenar la composición actual
-    interface StoredChampion {
-        id: string;
-        name: string;
-        icon: string;
-        cost: number;
-        level: number;
-        position: { row: number; col: number };
-        items: { 
-            id: string;
-            name: string;
-            icon: string;
-        }[];
-    }
-
-    // Función para obtener la composición actual
-    function getCurrentComposition(): StoredChampion[] {
-        const composition: StoredChampion[] = [];
-        const championCards = document.querySelectorAll('.hex-cell .champion-card');
-        
-        championCards.forEach(card => {
-            const cell = card.closest('.hex-cell');
-            if (!cell) return;
-            
-            const row = parseInt(cell.getAttribute('data-row') || '0');
-            const col = parseInt(cell.getAttribute('data-col') || '0');
-            const img = card.querySelector('img');
-            const starLevel = card.querySelector('.star-level');
-            const costBadge = card.querySelector('.cost-badge');
-            const itemElements = card.querySelectorAll('.items-container img');
-            
-            if (!img) return;
-            
-            // Determinar el nivel por la cantidad de estrellas
-            const starsText = starLevel?.textContent || '⭐';
-            const level = starsText.length;
-            
-            // Extraer el costo del badge
-            const costText = costBadge?.textContent?.replace('🥮', '').trim() || '1';
-            const cost = parseInt(costText);
-            
-            // Extraer los ítems
-            const items = Array.from(itemElements).map(item => {
-                return {
-                    id: item.getAttribute('data-item-id') || '',
-                    name: item.getAttribute('title') || '',
-                    icon: item.getAttribute('src') || ''
-                };
             });
-            
-            composition.push({
-                id: img.getAttribute('data-champion-id') || '',
-                name: img.getAttribute('title') || '',
-                icon: img.getAttribute('src') || '',
-                cost,
-                level,
-                position: { row, col },
-                items
+
+            card.addEventListener('dragend', function() {
+                card.classList.remove('opacity-50');
             });
         });
-        
-        return composition;
-    }
 
-    // Función para guardar la composición actual
-    function saveComposition() {
-        const composition = getCurrentComposition();
-        
-        // Guardar en localStorage
-        localStorage.setItem('tft-composition', JSON.stringify(composition));
-        
-        // Mostrar feedback al usuario
-        showToast('Composición guardada correctamente');
-    }
-    
-    // Función para descargar la composición como JSON
-    function downloadComposition() {
-        const composition = getCurrentComposition();
-        
-        if (composition.length === 0) {
-            showToast('No hay campeones en el tablero', true);
-            return;
-        }
-        
-        // Crear un objeto Blob con los datos y configurar el enlace de descarga
-        const json = JSON.stringify(composition, null, 2);
-        const blob = new Blob([json], { type: 'application/json' });
-        
-        // Crear un enlace temporal para la descarga
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        const date = new Date();
-        const formattedDate = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
-        a.download = `tft-composition-${formattedDate}.json`;
-        
-        // Simular clic para iniciar descarga
-        document.body.appendChild(a);
-        a.click();
-        
-        // Limpiar
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-        
-        showToast('Composición descargada correctamente');
-    }
-    
-    // Función para cargar la composición guardada en localStorage
-    function loadComposition() {
-        const storedComp = localStorage.getItem('tft-composition');
-        if (!storedComp) return;
-        
-        try {
-            // Limpiar el tablero primero
-            document.querySelectorAll('.hex-cell .hex-content').forEach(cell => {
-                cell.innerHTML = '';
-            });
-            
-            const composition: StoredChampion[] = JSON.parse(storedComp);
-            
-            composition.forEach(champion => {
-                const { row, col } = champion.position;
-                const cell = document.querySelector(`.hex-cell[data-row="${row}"][data-col="${col}"]`);
-                
-                if (!cell) return;
-                
-                const hexContent = cell.querySelector('.hex-content');
-                if (!hexContent) return;
-                
-                // Crear el campeón
-                const championCard = document.createElement('div');
-                championCard.className = 'champion-card relative';
-                
-                // Crear la imagen del campeón
-                const img = document.createElement('img');
-                img.src = champion.icon;
-                img.alt = champion.name;
-                img.title = champion.name;
-                img.className = 'w-10 h-10 sm:w-16 sm:h-16 rounded-full object-cover object-right';
-                img.setAttribute('data-champion-id', champion.id);
-                
-                // Crear estrellas
-                const levelDiv = document.createElement('div');
-                levelDiv.className = 'star-level absolute -top-2 sm:-top-5 left-1/2 transform -translate-x-1/2 text-yellow-400 text-xs sm:text-base';
-                levelDiv.textContent = '⭐'.repeat(champion.level);
-                
-                // Crear badge de costo
-                const costDiv = document.createElement('div');
-                costDiv.className = 'cost-badge absolute -bottom-1 sm:-bottom-2 left-1/2 transform -translate-x-1/2 bg-gray-800 bg-opacity-80 rounded-full px-1 py-0.5 sm:px-2 sm:py-1 text-xs sm:text-sm flex items-center';
-                costDiv.innerHTML = `<span class="mr-1">🥮</span> ${champion.cost}`;
-                
-                // Crear controles
-                const controlsDiv = document.createElement('div');
-                controlsDiv.className = 'champion-controls absolute -top-1 sm:-top-1 left-0 right-0 opacity-0 transition-opacity flex justify-center space-x-1 z-10';
-                
-                const decreaseBtn = document.createElement('button');
-                decreaseBtn.className = 'decrease-level bg-red-600 text-white rounded-full w-4 h-4 sm:w-5 sm:h-5 flex items-center justify-center text-xs';
-                decreaseBtn.title = 'Disminuir nivel';
-                decreaseBtn.textContent = '-';
-                
-                const increaseBtn = document.createElement('button');
-                increaseBtn.className = 'increase-level bg-green-600 text-white rounded-full w-4 h-4 sm:w-5 sm:h-5 flex items-center justify-center text-xs';
-                increaseBtn.title = 'Aumentar nivel';
-                increaseBtn.textContent = '+';
-                
-                const removeBtn = document.createElement('button');
-                removeBtn.className = 'remove-champion bg-gray-600 text-white rounded-full w-4 h-4 sm:w-5 sm:h-5 flex items-center justify-center text-xs';
-                removeBtn.title = 'Eliminar campeón';
-                removeBtn.textContent = '×';
-                
-                controlsDiv.appendChild(decreaseBtn);
-                controlsDiv.appendChild(increaseBtn);
-                controlsDiv.appendChild(removeBtn);
-                
-                // Agregar todo al campeón
-                championCard.appendChild(img);
-                championCard.appendChild(levelDiv);
-                championCard.appendChild(costDiv);
-                championCard.appendChild(controlsDiv);
-                
-                // Agregar ítems si existen
-                if (champion.items.length > 0) {
-                    const itemsContainer = document.createElement('div');
-                    itemsContainer.className = 'items-container absolute -bottom-4 sm:-bottom-8 left-1/2 transform -translate-x-1/2 flex justify-center gap-1';
-                    
-                    champion.items.forEach(item => {
-                        const itemImg = document.createElement('img');
-                        itemImg.src = item.icon;
-                        itemImg.alt = item.name;
-                        itemImg.title = item.name;
-                        itemImg.setAttribute('data-item-id', item.id);
-                        itemImg.className = 'w-4 h-4 sm:w-6 sm:h-6 object-cover object-right border-2 border-yellow-400';
-                        
-                        itemsContainer.appendChild(itemImg);
-                    });
-                    
-                    championCard.appendChild(itemsContainer);
-                }
-                
-                hexContent.appendChild(championCard);
-                
-                // Configurar los controles para este campeón
-                setupChampionControls(championCard);
-            });
-            
-            // Actualizar el estado visual después de cargar
-            setTimeout(() => updateChampionsVisualState(), 100);
-            
-            showToast('Composición cargada correctamente');
-        } catch (error) {
-            console.error('Error cargando la composición:', error);
-            showToast('Error al cargar la composición', true);
-        }
-    }
-    
-    // Función para subir una composición
-    function uploadComposition(event: Event) {
-        const input = event.target as HTMLInputElement;
-        
-        if (!input.files || input.files.length === 0) {
-            return;
-        }
-        
-        const file = input.files[0];
-        const reader = new FileReader();
-        
-        reader.onload = function(e) {
-            try {
-                const text = e.target?.result as string;
-                const composition: StoredChampion[] = JSON.parse(text);
-                
-                // Limpiar el tablero primero
-                document.querySelectorAll('.hex-cell .hex-content').forEach(cell => {
-                    cell.innerHTML = '';
-                });
-                
-                // Cargar la composición
-                composition.forEach(champion => {
-                    const { row, col } = champion.position;
-                    const cell = document.querySelector(`.hex-cell[data-row="${row}"][data-col="${col}"]`);
-                    
-                    if (!cell) return;
-                    
-                    const hexContent = cell.querySelector('.hex-content');
-                    if (!hexContent) return;
-                    
-                    // Crear el campeón
-                    const championCard = document.createElement('div');
-                    championCard.className = 'champion-card relative';
-                    
-                    // Crear la imagen del campeón
-                    const img = document.createElement('img');
-                    img.src = champion.icon;
-                    img.alt = champion.name;
-                    img.title = champion.name;
-                    img.className = 'w-10 h-10 sm:w-16 sm:h-16 object-cover object-right';
-                    img.setAttribute('data-champion-id', champion.id);
-                    
-                    // Crear estrellas
-                    const levelDiv = document.createElement('div');
-                    levelDiv.className = 'star-level absolute -top-2 sm:-top-5 left-1/2 transform -translate-x-1/2 text-yellow-400 text-xs sm:text-base';
-                    levelDiv.textContent = '⭐'.repeat(champion.level);
-                    
-                    // Crear badge de costo
-                    const costDiv = document.createElement('div');
-                    costDiv.className = 'cost-badge absolute -bottom-1 sm:-bottom-2 left-1/2 transform -translate-x-1/2 bg-gray-800 bg-opacity-80 rounded-full px-1 py-0.5 sm:px-2 sm:py-1 text-xs sm:text-sm flex items-center';
-                    costDiv.innerHTML = `<span class="mr-1">🥮</span> ${champion.cost}`;
-                    
-                    // Crear controles
-                    const controlsDiv = document.createElement('div');
-                    controlsDiv.className = 'champion-controls absolute -top-1 sm:-top-1 left-0 right-0 opacity-0 transition-opacity flex justify-center space-x-1 z-10';
-                    
-                    const decreaseBtn = document.createElement('button');
-                    decreaseBtn.className = 'decrease-level bg-red-600 text-white rounded-full w-4 h-4 sm:w-5 sm:h-5 flex items-center justify-center text-xs';
-                    decreaseBtn.title = 'Disminuir nivel';
-                    decreaseBtn.textContent = '-';
-                    
-                    const increaseBtn = document.createElement('button');
-                    increaseBtn.className = 'increase-level bg-green-600 text-white rounded-full w-4 h-4 sm:w-5 sm:h-5 flex items-center justify-center text-xs';
-                    increaseBtn.title = 'Aumentar nivel';
-                    increaseBtn.textContent = '+';
-                    
-                    const removeBtn = document.createElement('button');
-                    removeBtn.className = 'remove-champion bg-gray-600 text-white rounded-full w-4 h-4 sm:w-5 sm:h-5 flex items-center justify-center text-xs';
-                    removeBtn.title = 'Eliminar campeón';
-                    removeBtn.textContent = '×';
-                    
-                    controlsDiv.appendChild(decreaseBtn);
-                    controlsDiv.appendChild(increaseBtn);
-                    controlsDiv.appendChild(removeBtn);
-                    
-                    // Agregar todo al campeón
-                    championCard.appendChild(img);
-                    championCard.appendChild(levelDiv);
-                    championCard.appendChild(costDiv);
-                    championCard.appendChild(controlsDiv);
-                    
-                    // Agregar ítems si existen
-                    if (champion.items.length > 0) {
-                        const itemsContainer = document.createElement('div');
-                        itemsContainer.className = 'items-container absolute -bottom-4 sm:-bottom-8 left-1/2 transform -translate-x-1/2 flex justify-center gap-1';
-                        
-                        champion.items.forEach(item => {
-                            const itemImg = document.createElement('img');
-                            itemImg.src = item.icon;
-                            itemImg.alt = item.name;
-                            itemImg.title = item.name;
-                            itemImg.setAttribute('data-item-id', item.id);
-                            itemImg.className = 'w-4 h-4 sm:w-6 sm:h-6 rounded-full object-cover object-right border-2 border-yellow-400';
-                            
-                            itemsContainer.appendChild(itemImg);
-                        });
-                        
-                        championCard.appendChild(itemsContainer);
-                    }
-                    
-                    hexContent.appendChild(championCard);
-                    
-                    // Configurar los controles para este campeón
-                    setupChampionControls(championCard);
-                });
-                
-                // Actualizar el estado visual después de cargar
-                setTimeout(() => updateChampionsVisualState(), 100);
-                
-                showToast('Composición importada correctamente');
-                
-                // También guardar en localStorage para mantener consistencia
-                localStorage.setItem('tft-composition', text);
-            } catch (error) {
-                console.error('Error cargando el archivo:', error);
-                showToast('Error al cargar el archivo. Formato inválido.', true);
-            }
-            
-            // Resetear el input para permitir seleccionar el mismo archivo nuevamente
-            input.value = '';
-        };
-        
-        reader.onerror = function() {
-            showToast('Error al leer el archivo', true);
-            // Resetear el input
-            input.value = '';
-        };
-        
-        reader.readAsText(file);
-    }
-    
-    // Función para limpiar todo el tablero
-    function clearBoard() {
-        document.querySelectorAll('.hex-cell .hex-content').forEach(cell => {
-            cell.innerHTML = '';
-        });
-        updateChampionsVisualState();
-        showToast('Tablero limpiado correctamente');
-    }
-    
-    // Función para mostrar un toast de retroalimentación
-    function showToast(message: string, isError = false) {
-        const toast = document.createElement('div');
-        toast.className = `fixed bottom-4 right-4 ${isError ? 'bg-red-500' : 'bg-green-500'} text-white px-4 py-2 rounded shadow-lg z-50 transition-opacity`;
-        toast.textContent = message;
-        document.body.appendChild(toast);
-        
-        setTimeout(() => {
-            toast.style.opacity = '0';
-            setTimeout(() => {
-                document.body.removeChild(toast);
-            }, 300);
-        }, 3000);
-    }
-    
-    // Evento para guardar la composición
-    const saveBtn = document.getElementById('save-comp');
-    if (saveBtn) {
-        saveBtn.addEventListener('click', saveComposition);
-    }
-    
-    // Evento para descargar la composición
-    const downloadBtn = document.getElementById('download-comp');
-    if (downloadBtn) {
-        downloadBtn.addEventListener('click', downloadComposition);
-    }
-    
-    // Evento para subir una composición
-    const uploadInput = document.getElementById('upload-comp') as HTMLInputElement;
-    if (uploadInput) {
-        uploadInput.addEventListener('change', uploadComposition);
-    }
-    
-    // Evento para limpiar el tablero
-    const clearBtn = document.getElementById('clear-comp');
-    if (clearBtn) {
-        clearBtn.addEventListener('click', clearBoard);
-    }
-
-    // Agregar un nuevo escuchador para actualizar el estado visual cuando la página se carga completamente
-    document.addEventListener('DOMContentLoaded', function() {
-        // Cargar la composición guardada si existe
-        loadComposition();
-        // Actualizar el estado visual de los campeones
-        setTimeout(() => updateChampionsVisualState(), 200);
-    });
-
-    // Modificamos la función de los eventos de drag and drop
-    // Primero agregamos soporte para arrastrar campeones que ya están en el tablero
-    cells.forEach(cell => {
-        const hexContent = cell.querySelector('.hex-content');
-        
-        if (hexContent) {
-            // Hacer que los campeones en el tablero sean arrastrables
-            hexContent.addEventListener('mousedown', function(e) {
-                const championCard = hexContent.querySelector('.champion-card');
-                if (championCard) {
-                    // Solo iniciar drag si se hace clic directamente en la imagen del campeón
-                    const isOnImg = e.target && (e.target as HTMLElement).tagName === 'IMG';
-                    const isOnCard = championCard.contains(e.target as Node);
-                    
-                    // No permitir drag si se hizo clic en los controles
-                    const isOnControls = e.target && (
-                        (e.target as HTMLElement).closest('.increase-level') || 
-                        (e.target as HTMLElement).closest('.decrease-level') || 
-                        (e.target as HTMLElement).closest('.remove-champion')
-                    );
-                    
-                    if (isOnCard && !isOnControls) {
-                        championCard.setAttribute('draggable', 'true');
-                        
-                        // Configurar listeners de drag para este campeón
-                        championCard.addEventListener('dragstart', function(e: Event) {
-                            const dragEvent = e as DragEvent;
-                            if (dragEvent.dataTransfer) {
-                                // Marcamos que este campeón viene del tablero
-                                dragEvent.dataTransfer.setData('text/plain', 'board-champion');
-                                draggedElement = championCard;
-                            }
-                        }, { once: true });
-                    }
-                }
-            });
-            
-            // Al soltar el botón del mouse, deshabilitar el draggable
-            hexContent.addEventListener('mouseup', function() {
-                const championCard = hexContent.querySelector('.champion-card');
-                if (championCard) {
-                    championCard.setAttribute('draggable', 'false');
-                }
-            });
-        }
-    });
-
-    // Modificar el evento drop para manejar campeones que vienen del tablero
-    cells.forEach(cell => {
-        const hexContent = cell.querySelector('.hex-content');
-        
-        if (hexContent) {
-            hexContent.addEventListener('dragover', function(e: Event) {
-                e.preventDefault();
+        // Eventos para items del tablero
+        boardItemCards.forEach(card => {
+            card.addEventListener('dragstart', function(e: Event) {
                 const dragEvent = e as DragEvent;
                 if (dragEvent.dataTransfer) {
-                    dragEvent.dataTransfer.dropEffect = 'move';
+                    dragEvent.dataTransfer.setData('text/plain', card.getAttribute('data-item-id') || '');
+                    card.classList.add('opacity-50');
                 }
             });
-            
-            hexContent.addEventListener('drop', function(e: Event) {
-                e.preventDefault();
-                const dragEvent = e as DragEvent;
-                
-                if (!dragEvent.dataTransfer) return;
-                
-                // Obtener el tipo de elemento arrastrado
-                const data = dragEvent.dataTransfer.getData('text/plain');
-                
-                // Si es un campeón del tablero
-                if (data === 'board-champion' && draggedElement) {
-                    // Verificar si la celda destino ya tiene un campeón
-                    const existingChampion = hexContent.querySelector('.champion-card');
-                    
-                    // Si la celda destino está vacía
-                    if (!existingChampion) {
-                        // Mover el campeón a la nueva celda
-                        const originCell = draggedElement.closest('.hex-content');
-                        if (originCell && originCell !== hexContent) {
-                            hexContent.appendChild(draggedElement);
-                            originCell.innerHTML = '';
-                        }
-                    } 
-                    // Si la celda destino ya tiene un campeón, intercambiar posiciones
-                    else if (existingChampion && draggedElement !== existingChampion) {
-                        const originCell = draggedElement.closest('.hex-content');
-                        if (originCell) {
-                            // Intercambiar los campeones
-                            originCell.appendChild(existingChampion);
-                            hexContent.appendChild(draggedElement);
-                        }
-                    }
-                    
-                    // Restablecer el elemento arrastrado
-                    draggedElement = null;
-                }
-                // Código existente para otros tipos de elementos
-                else if (data && draggedElement) {
-                    // ... código existente para manejar campeones nuevos e items
-                }
-            });
-        }
-    });
 
-    // Función para mostrar/ocultar campeones
-    function toggleChampions() {
-        const button = document.getElementById('toggle-champions');
-        if (!button) return;
-        
-        const hiddenChampions = document.querySelectorAll('.initial-hidden');
-        const isShowingMore = button.textContent?.includes('Ver más');
-        
-        hiddenChampions.forEach(champion => {
-            if (isShowingMore) {
-                champion.classList.remove('hidden');
-                button.textContent = 'Ver menos';
-            } else {
-                champion.classList.add('hidden');
-                button.textContent = 'Ver más';
-            }
+            card.addEventListener('dragend', function() {
+                card.classList.remove('opacity-50');
+            });
         });
-    }
 
-    // Agregar el evento al botón cuando el DOM esté listo
-    document.addEventListener('DOMContentLoaded', () => {
-        const toggleButton = document.getElementById('toggle-champions');
-        if (toggleButton) {
-            toggleButton.addEventListener('click', toggleChampions);
+        // Función para gestionar los controles del campeón
+        function setupChampionControls(championCard: Element) {
+            const increaseBtn = championCard.querySelector('.increase-level');
+            const decreaseBtn = championCard.querySelector('.decrease-level');
+            const removeBtn = championCard.querySelector('.remove-champion');
+            const levelElement = championCard.querySelector('.star-level');
+            
+            if (increaseBtn && levelElement) {
+                increaseBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const starsText = levelElement.textContent || '⭐';
+                    const currentLevel = starsText.length;
+                    if (currentLevel < 3) {
+                        levelElement.textContent = '⭐'.repeat(currentLevel + 1);
+                    }
+                });
+            }
+            
+            if (decreaseBtn && levelElement) {
+                decreaseBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const starsText = levelElement.textContent || '⭐';
+                    const currentLevel = starsText.length;
+                    if (currentLevel > 1) {
+                        levelElement.textContent = '⭐'.repeat(currentLevel - 1);
+                    }
+                });
+            }
+            
+            if (removeBtn) {
+                removeBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const hexContent = championCard.closest('.hex-content');
+                    if (hexContent) {
+                        hexContent.innerHTML = '';
+                        updateChampionsVisualState();
+                    }
+                });
+            }
         }
-    });
+
+        // Actualizar los eventos de las celdas
+        boardCells.forEach(cell => {
+            cell.addEventListener('dragover', function(e: Event) {
+                e.preventDefault();
+                cell.classList.add('drag-over');
+            });
+
+            cell.addEventListener('dragleave', function() {
+                cell.classList.remove('drag-over');
+            });
+
+            cell.addEventListener('drop', function(e: Event) {
+                e.preventDefault();
+                cell.classList.remove('drag-over');
+                
+                const dragEvent = e as DragEvent;
+                if (!dragEvent.dataTransfer) return;
+
+                const data = dragEvent.dataTransfer.getData('text/plain');
+                const hexContent = cell.querySelector('.hex-content');
+                if (!hexContent) return;
+
+                // Aquí va la lógica de drop...
+            });
+        });
+
+        // Inicialización
+        updateChampionsVisualState();
+    })();
 </script>
 
 <style is:inline>
