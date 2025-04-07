@@ -165,7 +165,7 @@ for (let row = 0; row < 4; row++) {
                             class="w-full p-2 bg-gray-800 rounded-lg text-white text-sm"
                         />
                     </div>
-                    <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2" id="items-list">
+                    <div class="champions-list grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 sm:gap-4 p-4 h-[108px]" id="items-list">
                         {items.map((item, index) => (
                             <div
                                 class={`item-card bg-gray-800 rounded-lg p-1 sm:p-2 cursor-move ${index >= 10 ? 'hidden' : ''}`}
@@ -177,9 +177,9 @@ for (let row = 0; row < 4; row++) {
                                         src={item.icon} 
                                         alt={item.name} 
                                         title={item.name}
-                                        class="w-30 h-30 sm:w-20 sm:h-20 object-cover object-right border-2 border-yellow-400"
+                                        class="w-12 h-12 sm:w-16 sm:h-16 rounded-full object-cover object-right mx-auto"
                                     />
-                                    <p class="text-xs mt-1 text-center text-gray-300 truncate w-full">{item.name}</p>
+                                    <p class="flex content-center items-center h-full text-xs text-white wrap text-center text-[12px] w-[75%] m-auto overflow-hidden text-ellipsis">{item.name}</p>
                                 </div>
                             </div>
                         ))}
