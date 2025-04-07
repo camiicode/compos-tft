@@ -225,18 +225,38 @@ for (let row = 0; row < 4; row++) {
 
         // Función para gestionar los controles del campeón
         function setupChampionControls(championCard: Element) {
+            console.log('Configurando controles del campeón');
+            
             const increaseBtn = championCard.querySelector('.increase-level');
             const decreaseBtn = championCard.querySelector('.decrease-level');
             const removeBtn = championCard.querySelector('.remove-champion');
             const levelElement = championCard.querySelector('.star-level');
+            
+            console.log('Elementos encontrados:', {
+                increaseBtn: !!increaseBtn,
+                decreaseBtn: !!decreaseBtn,
+                removeBtn: !!removeBtn,
+                levelElement: !!levelElement
+            });
+            
+            if (levelElement) {
+                // Asegurarse de que el nivel inicial sea 1
+                levelElement.textContent = '⭐';
+                console.log('Nivel inicial establecido a 1 estrella');
+            }
             
             if (increaseBtn && levelElement) {
                 increaseBtn.addEventListener('click', function(e) {
                     e.stopPropagation();
                     const starsText = levelElement.textContent || '⭐';
                     const currentLevel = starsText.length;
+                    console.log(`Aumentando nivel de ${currentLevel} a ${currentLevel + 1}`);
+                    
                     if (currentLevel < 3) {
                         levelElement.textContent = '⭐'.repeat(currentLevel + 1);
+                        console.log(`Nivel actualizado a ${currentLevel + 1} estrellas`);
+                    } else {
+                        console.log('Ya está en el nivel máximo (3 estrellas)');
                     }
                 });
             }
@@ -246,8 +266,13 @@ for (let row = 0; row < 4; row++) {
                     e.stopPropagation();
                     const starsText = levelElement.textContent || '⭐';
                     const currentLevel = starsText.length;
+                    console.log(`Disminuyendo nivel de ${currentLevel} a ${currentLevel - 1}`);
+                    
                     if (currentLevel > 1) {
                         levelElement.textContent = '⭐'.repeat(currentLevel - 1);
+                        console.log(`Nivel actualizado a ${currentLevel - 1} estrellas`);
+                    } else {
+                        console.log('Ya está en el nivel mínimo (1 estrella)');
                     }
                 });
             }
@@ -259,6 +284,7 @@ for (let row = 0; row < 4; row++) {
                     if (hexContent) {
                         hexContent.innerHTML = '';
                         updateChampionsVisualState();
+                        console.log('Campeón eliminado del tablero');
                     }
                 });
             }
@@ -398,6 +424,9 @@ for (let row = 0; row < 4; row++) {
                         // Configurar los controles del campeón
                         const championCard = hexContent.querySelector('.champion-card');
                         if (championCard) {
+                            console.log('Configurando controles para el nuevo campeón');
+                            
+                            // Configurar los controles del campeón
                             setupChampionControls(championCard);
                             
                             // Mostrar controles al pasar el mouse
@@ -410,6 +439,8 @@ for (let row = 0; row < 4; row++) {
                                 const controls = championCard.querySelector('.champion-controls');
                                 if (controls) controls.classList.add('opacity-0');
                             });
+                        } else {
+                            console.error('No se pudo encontrar el elemento champion-card después de crearlo');
                         }
                         
                         // Actualizar el estado visual de los campeones
