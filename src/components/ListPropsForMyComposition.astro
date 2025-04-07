@@ -23,16 +23,13 @@ const {
     rows = 2
 } = Astro.props;
 
-let items: (Champion | Item)[] = [];
+let allItems: (Champion | Item)[] = [];
 try {
     if (type === 'champions') {
-        items = await getChampions();
+        allItems = await getChampions();
     } else if (type === 'objects') {
-        items = await getItems();
+        allItems = await getItems();
     }
-    // Limitar el número de items según las filas y columnas especificadas
-    const maxItems = columns * rows;
-    items = items.slice(0, maxItems);
 } catch (error) {
     console.error(`Error al cargar ${type}:`, error);
 }
@@ -53,13 +50,36 @@ const getBorderColor = (item: Champion | Item) => {
 ---
 
 <div class="list-container p-4 bg-gray-800 rounded-lg">
-    <h2 class="text-xl font-bold mb-4">{title}</h2>
-    <div class={`grid grid-cols-${columns} gap-4`} style={`grid-template-columns: repeat(${columns}, minmax(0, 1fr));`}>
-        {items.map((item: Champion | Item) => (
+    <div class="flex justify-between items-center mb-4">
+        <h2 class="text-xl font-bold">{title}</h2>
+        <div class="flex gap-2">
+            <button class="ver-menos px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                Ver menos
+            </button>
+            <button class="ver-mas px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                Ver más
+            </button>
+        </div>
+    </div>
+
+    <div class="mb-4">
+        <input 
+            type="text" 
+            placeholder="Buscar..." 
+            class="w-full px-4 py-2 bg-gray-700 text-white rounded border border-gray-600 focus:outline-none focus:border-blue-500"
+            id="searchInput"
+        />
+    </div>
+
+    <div class={`grid grid-cols-${columns} gap-4`} style={`grid-template-columns: repeat(${columns}, minmax(0, 1fr));`} id="itemsGrid">
+        {allItems.map((item: Champion | Item, index) => (
             <div 
                 class={`item-card bg-gray-700 p-2 rounded-lg cursor-pointer hover:bg-gray-600 transition-colors border-2 ${getBorderColor(item)}`}
                 draggable="true"
                 data-item-id={item.id}
+                data-name={item.name.toLowerCase()}
+                data-index={index}
+                style={index >= columns * rows ? "display: none;" : ""}
             >
                 <div class="flex flex-col text-center items-center gap-2">
                     <img 
@@ -92,4 +112,71 @@ const getBorderColor = (item: Champion | Item) => {
     .item-card:hover {
         transform: scale(1.02);
     }
-</style> 
+</style>
+
+<script define:vars={{ columns, rows, allItems }}>
+    let currentRows = rows;
+    const maxItems = allItems.length;
+    let showingAll = false;
+
+    const searchInput = document.getElementById('searchInput');
+    const itemsGrid = document.getElementById('itemsGrid');
+    const verMasBtn = document.querySelector('.ver-mas');
+    const verMenosBtn = document.querySelector('.ver-menos');
+
+    function updateVisibleItems(searchTerm = '') {
+        const itemCards = itemsGrid.querySelectorAll('.item-card');
+        let visibleCount = 0;
+        const isSearching = searchTerm.length > 0;
+
+        itemCards.forEach(card => {
+            const name = card.getAttribute('data-name');
+            const index = parseInt(card.getAttribute('data-index'));
+            const matchesSearch = name.includes(searchTerm.toLowerCase());
+            
+            // Si hay búsqueda, mostramos todas las coincidencias
+            // Si no hay búsqueda, mostramos según el estado (todos o limitados)
+            const shouldShow = isSearching ? 
+                matchesSearch : 
+                (showingAll ? true : index < (rows * columns));
+            
+            if (shouldShow) {
+                card.style.display = '';
+                visibleCount++;
+            } else {
+                card.style.display = 'none';
+            }
+        });
+
+        // Los botones se deshabilitan durante la búsqueda
+        if (isSearching) {
+            verMasBtn.disabled = true;
+            verMenosBtn.disabled = true;
+        } else {
+            // Ver más solo se habilita si no estamos mostrando todo
+            verMasBtn.disabled = showingAll;
+            // Ver menos solo se habilita si estamos mostrando todo
+            verMenosBtn.disabled = !showingAll;
+        }
+
+        verMasBtn.style.opacity = verMasBtn.disabled ? '0.5' : '1';
+        verMenosBtn.style.opacity = verMenosBtn.disabled ? '0.5' : '1';
+    }
+
+    searchInput.addEventListener('input', (e) => {
+        updateVisibleItems(e.target.value);
+    });
+
+    verMasBtn.addEventListener('click', () => {
+        showingAll = true;
+        updateVisibleItems(searchInput.value);
+    });
+
+    verMenosBtn.addEventListener('click', () => {
+        showingAll = false;
+        updateVisibleItems(searchInput.value);
+    });
+
+    // Inicialización
+    updateVisibleItems();
+</script> 
