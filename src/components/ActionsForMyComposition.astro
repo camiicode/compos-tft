@@ -245,6 +245,19 @@
                 const championCard = document.createElement('div');
                 championCard.className = 'champion-card relative';
                 
+                // Añadir la clase de borde según el costo
+                if (champion.cost === 1) {
+                    championCard.classList.add('border-gray-400');
+                } else if (champion.cost === 2) {
+                    championCard.classList.add('border-green-500');
+                } else if (champion.cost === 3) {
+                    championCard.classList.add('border-blue-500');
+                } else if (champion.cost === 4) {
+                    championCard.classList.add('border-purple-500');
+                } else if (champion.cost >= 5) {
+                    championCard.classList.add('border-orange-500');
+                }
+                
                 // Crear la imagen del campeón
                 const img = document.createElement('img');
                 img.src = champion.icon;
@@ -350,7 +363,7 @@
                     if (controls) controls.classList.add('opacity-0');
                 });
                 
-                console.log(`Campeón ${champion.name} cargado correctamente en la posición (${row},${col})`);
+                console.log(`Campeón ${champion.name} cargado correctamente en la posición (${row},${col}) con costo ${champion.cost}`);
             });
             
             // Actualizar el estado visual
@@ -397,23 +410,31 @@
                     const championCard = document.createElement('div');
                     championCard.className = 'champion-card relative';
                     
+                    // Añadir la clase de borde según el costo
+                    if (champion.cost === 1) {
+                        championCard.classList.add('border-gray-400');
+                    } else if (champion.cost === 2) {
+                        championCard.classList.add('border-green-500');
+                    } else if (champion.cost === 3) {
+                        championCard.classList.add('border-blue-500');
+                    } else if (champion.cost === 4) {
+                        championCard.classList.add('border-purple-500');
+                    } else if (champion.cost >= 5) {
+                        championCard.classList.add('border-orange-500');
+                    }
+                    
                     // Crear la imagen del campeón
                     const img = document.createElement('img');
                     img.src = champion.icon;
                     img.alt = champion.name;
                     img.title = champion.name;
-                    img.className = 'w-10 h-10 sm:w-16 sm:h-16 object-cover object-right';
+                    img.className = 'w-10 h-10 sm:w-16 sm:h-16 rounded-full object-cover object-right';
                     img.setAttribute('data-champion-id', champion.id);
                     
                     // Crear estrellas
                     const levelDiv = document.createElement('div');
                     levelDiv.className = 'star-level absolute -top-2 sm:-top-5 left-1/2 transform -translate-x-1/2 text-yellow-400 text-xs sm:text-base';
                     levelDiv.textContent = '⭐'.repeat(champion.level);
-                    
-                    // Crear badge de costo
-                    const costDiv = document.createElement('div');
-                    costDiv.className = 'cost-badge absolute -bottom-1 sm:-bottom-2 left-1/2 transform -translate-x-1/2 bg-gray-800 bg-opacity-80 rounded-full px-1 py-0.5 sm:px-2 sm:py-1 text-xs sm:text-sm flex items-center';
-                    costDiv.innerHTML = `<span class="mr-1">🥮</span> ${champion.cost}`;
                     
                     // Crear controles
                     const controlsDiv = document.createElement('div');
@@ -441,27 +462,66 @@
                     // Agregar todo al campeón
                     championCard.appendChild(img);
                     championCard.appendChild(levelDiv);
-                    championCard.appendChild(costDiv);
                     championCard.appendChild(controlsDiv);
                     
                     // Agregar ítems si existen
                     if (champion.items && champion.items.length > 0) {
+                        const itemsContainer = document.createElement('div');
+                        itemsContainer.className = 'items-container absolute -bottom-4 sm:-bottom-8 left-1/2 transform -translate-x-1/2 flex justify-center gap-1';
+                        
                         champion.items.forEach(itemId => {
-                            const itemBadge = document.createElement('div');
-                            itemBadge.className = 'item-badge absolute -right-1 sm:-right-2 -top-1 sm:-top-2 bg-gray-800 bg-opacity-80 rounded-full p-1 sm:p-2';
-                            itemBadge.setAttribute('data-item-id', itemId);
+                            // Buscar el objeto en la lista para obtener su información
+                            const itemElement = document.querySelector(`.item-card[data-item-id="${itemId}"]`);
+                            let itemIcon = `/items/${itemId}.png`;
+                            let itemName = `Item ${itemId}`;
+                            
+                            if (itemElement) {
+                                const itemImg = itemElement.querySelector('img');
+                                if (itemImg) {
+                                    itemIcon = itemImg.getAttribute('src') || itemIcon;
+                                    itemName = itemImg.getAttribute('alt') || itemName;
+                                }
+                            }
                             
                             const itemImg = document.createElement('img');
-                            itemImg.src = `/items/${itemId}.png`;
-                            itemImg.alt = `Item ${itemId}`;
-                            itemImg.className = 'w-4 h-4 sm:w-6 sm:h-6 object-cover';
+                            itemImg.src = itemIcon;
+                            itemImg.alt = itemName;
+                            itemImg.title = itemName;
+                            itemImg.className = 'w-4 h-4 sm:w-6 sm:h-6 object-cover object-right border-2 border-yellow-400';
+                            itemImg.setAttribute('data-item-id', itemId);
                             
-                            itemBadge.appendChild(itemImg);
-                            championCard.appendChild(itemBadge);
+                            // Añadir evento para eliminar el objeto al hacer clic
+                            itemImg.addEventListener('click', function(e) {
+                                e.stopPropagation();
+                                itemImg.remove();
+                                
+                                // Si no quedan objetos, eliminar el contenedor
+                                if (itemsContainer && itemsContainer.children.length === 0) {
+                                    itemsContainer.remove();
+                                }
+                            });
+                            
+                            itemsContainer.appendChild(itemImg);
                         });
+                        
+                        championCard.appendChild(itemsContainer);
                     }
                     
                     hexContent.appendChild(championCard);
+                    
+                    // Configurar los controles del campeón
+                    setupChampionControls(championCard);
+                    
+                    // Mostrar controles al pasar el mouse
+                    championCard.addEventListener('mouseenter', function() {
+                        const controls = championCard.querySelector('.champion-controls');
+                        if (controls) controls.classList.remove('opacity-0');
+                    });
+                    
+                    championCard.addEventListener('mouseleave', function() {
+                        const controls = championCard.querySelector('.champion-controls');
+                        if (controls) controls.classList.add('opacity-0');
+                    });
                 });
                 
                 // Actualizar el estado visual

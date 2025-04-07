@@ -436,6 +436,19 @@ for (let row = 0; row < 4; row++) {
                                 console.error('No se encontró la imagen del campeón');
                             }
                             
+                            // Asegurarse de que se aplique la clase de borde correcta
+                            if (championCost === 1) {
+                                championCard.classList.add('border-gray-400');
+                            } else if (championCost === 2) {
+                                championCard.classList.add('border-green-500');
+                            } else if (championCost === 3) {
+                                championCard.classList.add('border-blue-500');
+                            } else if (championCost === 4) {
+                                championCard.classList.add('border-purple-500');
+                            } else if (championCost >= 5) {
+                                championCard.classList.add('border-orange-500');
+                            }
+                            
                             // Configurar los controles del campeón
                             setupChampionControls(championCard);
                             
