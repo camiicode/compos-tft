@@ -1,0 +1,95 @@
+---
+import type { Champion } from '../types/tft';
+import { getChampions } from '../services/riotApi';
+import { getItems } from '../services/riotApi';
+
+interface Props {
+    type: 'champions' | 'objects';
+    title?: string;
+    columns?: number;
+    rows?: number;
+}
+
+interface Item {
+    id: string;
+    name: string;
+    icon: string;
+}
+
+const { 
+    type, 
+    title = type === 'champions' ? 'Campeones Disponibles' : 'Objetos Disponibles',
+    columns = 5,
+    rows = 2
+} = Astro.props;
+
+let items: (Champion | Item)[] = [];
+try {
+    if (type === 'champions') {
+        items = await getChampions();
+    } else if (type === 'objects') {
+        items = await getItems();
+    }
+    // Limitar el número de items según las filas y columnas especificadas
+    const maxItems = columns * rows;
+    items = items.slice(0, maxItems);
+} catch (error) {
+    console.error(`Error al cargar ${type}:`, error);
+}
+
+const getBorderColor = (item: Champion | Item) => {
+    if (type === 'champions' && 'cost' in item) {
+        switch (item.cost) {
+            case 1: return 'border-gray-400';
+            case 2: return 'border-green-400';
+            case 3: return 'border-blue-400';
+            case 4: return 'border-purple-400';
+            case 5: return 'border-yellow-400';
+            default: return 'border-gray-400';
+        }
+    }
+    return 'border-gray-400';
+};
+---
+
+<div class="list-container p-4 bg-gray-800 rounded-lg">
+    <h2 class="text-xl font-bold mb-4">{title}</h2>
+    <div class={`grid grid-cols-${columns} gap-4`} style={`grid-template-columns: repeat(${columns}, minmax(0, 1fr));`}>
+        {items.map((item: Champion | Item) => (
+            <div 
+                class={`item-card bg-gray-700 p-2 rounded-lg cursor-pointer hover:bg-gray-600 transition-colors border-2 ${getBorderColor(item)}`}
+                draggable="true"
+                data-item-id={item.id}
+            >
+                <div class="flex flex-col text-center items-center gap-2">
+                    <img 
+                        src={item.icon} 
+                        alt={item.name}
+                        class="w-10 h-10 rounded-full"
+                    />
+                    <div>
+                        <h3 class="font-semibold">{item.name}</h3>
+                        {type === 'champions' && 'cost' in item && (
+                            <p class="text-sm text-gray-300">Costo: {item.cost}</p>
+                        )}
+                    </div>
+                </div>
+            </div>
+        ))}
+    </div>
+</div>
+
+<style>
+    .list-container {
+        max-width: 800px;
+        margin: 0 auto;
+    }
+
+    .item-card {
+        transition: transform 0.2s;
+    }
+
+    .item-card:hover {
+        transform: scale(1.02);
+    }
+</style> 

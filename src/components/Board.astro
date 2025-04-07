@@ -3,6 +3,7 @@ import { getChampions, getItems } from '../services/riotApi';
 import type { Champion, Item, BoardCell } from '../types/tft';
 import ItemSidebar from './ItemSidebar.astro';
 import ActionsForMyComposition from './ActionsForMyComposition.astro';
+import ListPropsForMyCompositions from './ListPropsForMyComposition.astro';
 
 const champions = await getChampions();
 const items = await getItems();
@@ -185,6 +186,20 @@ for (let row = 0; row < 4; row++) {
                         ))}
                     </div>
                 </div>
+
+                <ListPropsForMyCompositions
+                    title="Objetos"
+                    type="objects"
+                    columns={5}
+                    rows={2}
+                />
+
+                <ListPropsForMyCompositions
+                    title="Campeones"
+                    type="champions"
+                    columns={5}
+                    rows={2}
+                />
             </div>
         </div>
     </div>
