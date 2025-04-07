@@ -96,7 +96,7 @@ const componentId = `list-${type}-${Math.random().toString(36).substring(2, 9)}`
                         onerror="this.src='https://ddragon.leagueoflegends.com/cdn/13.24.1/img/tft-item/1.png'"
                     />
                     <div>
-                        <h3 class="font-semibold">{item.name}</h3>
+                        <h3 class="font-semibold text-[1rem] leading-none">{item.name}</h3>
                         {type === 'champions' && 'cost' in item && (
                             <p class="text-sm text-gray-300">Costo: {item.cost}</p>
                         )}

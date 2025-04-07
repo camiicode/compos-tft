@@ -187,7 +187,7 @@ export async function getItems(): Promise<Item[]> {
         const items: Item[] = Object.values(itemsData).map((item: any) => ({
             id: item.id,
             name: item.name,
-            description: item.description || 'Sin descripción',
+            description: item.description || '',
             icon: `${DDragon_IMG_URL}/tft-item/${item.image.full}` // URL de la imagen
         }));
         
