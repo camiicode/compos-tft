@@ -80,11 +80,12 @@ const componentId = `list-${type}-${Math.random().toString(36).substring(2, 9)}`
     <div class="grid gap-4" style={`grid-template-columns: repeat(${columns}, minmax(0, 1fr));`} id={`itemsGrid-${componentId}`}>
         {allItems.map((item: Champion | Item, index) => (
             <div 
-                class={`item-card bg-gray-700 p-2 rounded-lg cursor-pointer hover:bg-gray-600 transition-colors border-2 ${getBorderColor(item)}`}
+                class={`${type === 'champions' ? 'champion-item' : 'item-card'} bg-gray-700 p-2 rounded-lg cursor-pointer hover:bg-gray-600 transition-colors border-2 ${getBorderColor(item)}`}
                 draggable="true"
                 data-item-id={item.id}
                 data-name={item.name.toLowerCase()}
                 data-index={index}
+                data-type={type}
                 style={index >= columns * rows ? "display: none;" : ""}
             >
                 <div class="flex flex-col text-center items-center gap-2">
@@ -117,11 +118,11 @@ const componentId = `list-${type}-${Math.random().toString(36).substring(2, 9)}`
         margin: 0 auto;
     }
 
-    .item-card {
+    .item-card, .champion-item {
         transition: transform 0.2s;
     }
 
-    .item-card:hover {
+    .item-card:hover, .champion-item:hover {
         transform: scale(1.02);
     }
 </style>
@@ -152,7 +153,7 @@ const componentId = `list-${type}-${Math.random().toString(36).substring(2, 9)}`
             const isSearching = searchTerm.length > 0;
             console.log(`Actualizando elementos visibles para ${type}. Búsqueda: "${searchTerm}", isSearching: ${isSearching}, showingAll: ${showingAll}`);
             
-            const itemCards = Array.from(itemsGrid.querySelectorAll('.item-card'));
+            const itemCards = Array.from(itemsGrid.querySelectorAll('.item-card, .champion-item'));
             console.log(`Total de tarjetas encontradas para ${type}: ${itemCards.length}`);
             
             let visibleCount = 0;

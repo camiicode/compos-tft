@@ -119,10 +119,9 @@ for (let row = 0; row < 4; row++) {
     (function initializeBoard() {
         // Variables locales al scope de la función
         const boardElement = document.getElementById('board');
-        const boardChampionCards = document.querySelectorAll('#board .champion-item');
-        const boardItemCards = document.querySelectorAll('#board .item-card');
         const boardCells = document.querySelectorAll('#board .hex-cell');
-
+        
+        // Función para verificar si un campeón ya está en el tablero
         function isChampionOnBoard(championId: string): boolean {
             const boardCells = document.querySelectorAll('#board .hex-content');
             for (const cell of boardCells) {
@@ -137,12 +136,38 @@ for (let row = 0; row < 4; row++) {
             return false;
         }
 
+        // Función para verificar si un objeto ya está equipado en un campeón
+        function isItemEquippedOnChampion(championCard: Element, itemId: string): boolean {
+            const itemsContainer = championCard.querySelector('.items-container');
+            if (!itemsContainer) return false;
+            
+            const itemImages = itemsContainer.querySelectorAll('img');
+            for (const img of itemImages) {
+                if (img.getAttribute('data-item-id') === itemId) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        // Función para contar cuántos objetos tiene un campeón
+        function countChampionItems(championCard: Element): number {
+            const itemsContainer = championCard.querySelector('.items-container');
+            if (!itemsContainer) return 0;
+            
+            return itemsContainer.querySelectorAll('img').length;
+        }
+
+        // Función para actualizar el estado visual de los campeones
         function updateChampionsVisualState(): void {
-            const championsList = document.querySelectorAll('#board .champion-item');
+            console.log('Actualizando estado visual de campeones');
+            const championsList = document.querySelectorAll('.champion-item');
+            console.log(`Encontrados ${championsList.length} campeones para actualizar`);
             
             championsList.forEach(card => {
-                const championId = card.getAttribute('data-champion-id');
+                const championId = card.getAttribute('data-item-id');
                 if (championId && isChampionOnBoard(championId)) {
+                    console.log(`Campeón ${championId} ya está en el tablero`);
                     card.classList.add('opacity-50');
                     card.setAttribute('data-on-board', 'true');
                     card.setAttribute('draggable', 'false');
@@ -154,41 +179,49 @@ for (let row = 0; row < 4; row++) {
             });
         }
 
-        // Eventos para campeones del tablero
-        boardChampionCards.forEach(card => {
-            card.addEventListener('dragstart', function(e: Event) {
+        // Configurar eventos de drag and drop para los elementos de la lista
+        function setupDragAndDrop() {
+            console.log('Configurando eventos de drag and drop');
+            
+            // Eventos para campeones y objetos de las listas
+            document.addEventListener('dragstart', function(e: Event) {
                 const dragEvent = e as DragEvent;
-                const championId = card.getAttribute('data-champion-id');
-                if (championId && isChampionOnBoard(championId)) {
+                const target = e.target as HTMLElement;
+                
+                if (!target || !dragEvent.dataTransfer) return;
+                
+                // Verificar si es un campeón o un objeto
+                const itemType = target.getAttribute('data-type');
+                const itemId = target.getAttribute('data-item-id');
+                
+                if (!itemId) return;
+                
+                console.log(`Iniciando arrastre de ${itemType} con ID: ${itemId}`);
+                
+                // Si es un campeón y ya está en el tablero, evitar el arrastre
+                if (itemType === 'champions' && isChampionOnBoard(itemId)) {
+                    console.log(`Campeón ${itemId} ya está en el tablero, cancelando arrastre`);
                     dragEvent.preventDefault();
                     return;
                 }
                 
-                if (dragEvent.dataTransfer) {
-                    dragEvent.dataTransfer.setData('text/plain', championId || '');
-                    card.classList.add('opacity-50');
+                // Configurar datos para el arrastre
+                dragEvent.dataTransfer.setData('text/plain', JSON.stringify({
+                    id: itemId,
+                    type: itemType
+                }));
+                
+                // Efecto visual durante el arrastre
+                target.classList.add('opacity-50');
+            });
+            
+            document.addEventListener('dragend', function(e: Event) {
+                const target = e.target as HTMLElement;
+                if (target) {
+                    target.classList.remove('opacity-50');
                 }
             });
-
-            card.addEventListener('dragend', function() {
-                card.classList.remove('opacity-50');
-            });
-        });
-
-        // Eventos para items del tablero
-        boardItemCards.forEach(card => {
-            card.addEventListener('dragstart', function(e: Event) {
-                const dragEvent = e as DragEvent;
-                if (dragEvent.dataTransfer) {
-                    dragEvent.dataTransfer.setData('text/plain', card.getAttribute('data-item-id') || '');
-                    card.classList.add('opacity-50');
-                }
-            });
-
-            card.addEventListener('dragend', function() {
-                card.classList.remove('opacity-50');
-            });
-        });
+        }
 
         // Función para gestionar los controles del campeón
         function setupChampionControls(championCard: Element) {
@@ -231,6 +264,55 @@ for (let row = 0; row < 4; row++) {
             }
         }
 
+        // Función para añadir un objeto a un campeón
+        function addItemToChampion(championCard: Element, itemId: string, itemName: string, itemIcon: string) {
+            console.log(`Añadiendo objeto ${itemId} al campeón`);
+            
+            // Verificar si el objeto ya está equipado
+            if (isItemEquippedOnChampion(championCard, itemId)) {
+                console.log(`El objeto ${itemId} ya está equipado en este campeón`);
+                return false;
+            }
+            
+            // Verificar si el campeón ya tiene 3 objetos
+            if (countChampionItems(championCard) >= 3) {
+                console.log(`El campeón ya tiene 3 objetos, no se pueden añadir más`);
+                return false;
+            }
+            
+            // Obtener o crear el contenedor de objetos
+            let itemsContainer = championCard.querySelector('.items-container');
+            if (!itemsContainer) {
+                itemsContainer = document.createElement('div');
+                itemsContainer.className = 'items-container absolute -bottom-4 sm:-bottom-8 left-1/2 transform -translate-x-1/2 flex justify-center gap-1';
+                championCard.appendChild(itemsContainer);
+            }
+            
+            // Crear el elemento del objeto
+            const itemElement = document.createElement('img');
+            itemElement.src = itemIcon;
+            itemElement.alt = itemName;
+            itemElement.title = itemName;
+            itemElement.className = 'w-4 h-4 sm:w-6 sm:h-6 object-cover object-right border-2 border-yellow-400';
+            itemElement.setAttribute('data-item-id', itemId);
+            
+            // Añadir el objeto al contenedor
+            itemsContainer.appendChild(itemElement);
+            
+            // Añadir evento para eliminar el objeto al hacer clic
+            itemElement.addEventListener('click', function(e) {
+                e.stopPropagation();
+                itemElement.remove();
+                
+                // Si no quedan objetos, eliminar el contenedor
+                if (itemsContainer && itemsContainer.children.length === 0) {
+                    itemsContainer.remove();
+                }
+            });
+            
+            return true;
+        }
+
         // Actualizar los eventos de las celdas
         boardCells.forEach(cell => {
             cell.addEventListener('dragover', function(e: Event) {
@@ -249,15 +331,116 @@ for (let row = 0; row < 4; row++) {
                 const dragEvent = e as DragEvent;
                 if (!dragEvent.dataTransfer) return;
 
-                const data = dragEvent.dataTransfer.getData('text/plain');
-                const hexContent = cell.querySelector('.hex-content');
-                if (!hexContent) return;
-
-                // Aquí va la lógica de drop...
+                try {
+                    const data = JSON.parse(dragEvent.dataTransfer.getData('text/plain'));
+                    console.log('Datos recibidos en drop:', data);
+                    
+                    const hexContent = cell.querySelector('.hex-content');
+                    if (!hexContent) return;
+                    
+                    // Obtener el elemento arrastrado
+                    const itemType = data.type;
+                    const itemId = data.id;
+                    
+                    if (itemType === 'champions') {
+                        // Si ya hay un campeón en la celda, no permitir soltar otro
+                        if (hexContent.querySelector('.champion-card')) {
+                            console.log('Ya hay un campeón en esta celda');
+                            return;
+                        }
+                        
+                        // Buscar el campeón en la lista
+                        const championItem = document.querySelector(`.champion-item[data-item-id="${itemId}"]`);
+                        if (!championItem) return;
+                        
+                        // Crear una copia del campeón para el tablero
+                        const championName = championItem.querySelector('h3')?.textContent || '';
+                        const championIcon = championItem.querySelector('img')?.getAttribute('src') || '';
+                        const championCost = parseInt(championItem.querySelector('p')?.textContent?.replace('Costo: ', '') || '1');
+                        
+                        // Crear el elemento del campeón en el tablero
+                        hexContent.innerHTML = `
+                            <div class="champion-card relative" class:list="[
+                                'border-2',
+                                {
+                                    'border-gray-400': ${championCost} === 1,
+                                    'border-green-500': ${championCost} === 2,
+                                    'border-blue-500': ${championCost} === 3,
+                                    'border-purple-500': ${championCost} === 4,
+                                    'border-orange-500': ${championCost} >= 5
+                                }
+                            ]">
+                                <img 
+                                    src="${championIcon}" 
+                                    alt="${championName}" 
+                                    title="${championName}"
+                                    data-champion-id="${itemId}"
+                                    class="w-10 h-10 sm:w-16 sm:h-16 rounded-full object-cover object-right"
+                                />
+                                <div class="star-level absolute -top-2 sm:-top-5 left-1/2 transform -translate-x-1/2 text-yellow-400 text-xs sm:text-base">
+                                    ⭐
+                                </div>
+                                
+                                <div class="champion-controls absolute -top-1 sm:-top-1 left-0 right-0 opacity-0 transition-opacity flex justify-center space-x-1 z-10">
+                                    <button class="decrease-level bg-red-600 text-white rounded-full w-4 h-4 sm:w-5 sm:h-5 flex items-center justify-center text-xs" title="Disminuir nivel">
+                                        -
+                                    </button>
+                                    <button class="increase-level bg-green-600 text-white rounded-full w-4 h-4 sm:w-5 sm:h-5 flex items-center justify-center text-xs" title="Aumentar nivel">
+                                        +
+                                    </button>
+                                    <button class="remove-champion bg-gray-600 text-white rounded-full w-4 h-4 sm:w-5 sm:h-5 flex items-center justify-center text-xs" title="Eliminar campeón">
+                                        ×
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                        
+                        // Configurar los controles del campeón
+                        const championCard = hexContent.querySelector('.champion-card');
+                        if (championCard) {
+                            setupChampionControls(championCard);
+                            
+                            // Mostrar controles al pasar el mouse
+                            championCard.addEventListener('mouseenter', function() {
+                                const controls = championCard.querySelector('.champion-controls');
+                                if (controls) controls.classList.remove('opacity-0');
+                            });
+                            
+                            championCard.addEventListener('mouseleave', function() {
+                                const controls = championCard.querySelector('.champion-controls');
+                                if (controls) controls.classList.add('opacity-0');
+                            });
+                        }
+                        
+                        // Actualizar el estado visual de los campeones
+                        updateChampionsVisualState();
+                    } else if (itemType === 'objects') {
+                        // Verificar si hay un campeón en la celda
+                        const championCard = hexContent.querySelector('.champion-card');
+                        if (!championCard) {
+                            console.log('No hay campeón en esta celda, no se puede añadir un objeto');
+                            return;
+                        }
+                        
+                        // Buscar el objeto en la lista
+                        const itemElement = document.querySelector(`.item-card[data-item-id="${itemId}"]`);
+                        if (!itemElement) return;
+                        
+                        // Obtener información del objeto
+                        const itemName = itemElement.querySelector('h3')?.textContent || '';
+                        const itemIcon = itemElement.querySelector('img')?.getAttribute('src') || '';
+                        
+                        // Añadir el objeto al campeón
+                        addItemToChampion(championCard, itemId, itemName, itemIcon);
+                    }
+                } catch (error) {
+                    console.error('Error al procesar el drop:', error);
+                }
             });
         });
 
         // Inicialización
+        setupDragAndDrop();
         updateChampionsVisualState();
     })();
 </script>
