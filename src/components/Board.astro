@@ -336,6 +336,7 @@ for (let row = 0; row < 4; row++) {
                 }
             });
             
+            console.log(`Objeto ${itemId} añadido correctamente al campeón`);
             return true;
         }
 
@@ -425,6 +426,15 @@ for (let row = 0; row < 4; row++) {
                         const championCard = hexContent.querySelector('.champion-card');
                         if (championCard) {
                             console.log('Configurando controles para el nuevo campeón');
+                            
+                            // Verificar que el atributo data-champion-id se haya establecido correctamente
+                            const img = championCard.querySelector('img');
+                            if (img) {
+                                const championId = img.getAttribute('data-champion-id');
+                                console.log(`ID del campeón establecido: ${championId}`);
+                            } else {
+                                console.error('No se encontró la imagen del campeón');
+                            }
                             
                             // Configurar los controles del campeón
                             setupChampionControls(championCard);

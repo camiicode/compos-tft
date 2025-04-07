@@ -59,6 +59,8 @@
         const composition: StoredChampion[] = [];
         const cells = document.querySelectorAll('.hex-cell');
         
+        console.log(`Encontradas ${cells.length} celdas en el tablero`);
+        
         cells.forEach(cell => {
             const championCard = cell.querySelector('.champion-card');
             if (!championCard) return;
@@ -67,23 +69,41 @@
             if (!img) return;
             
             const championId = img.getAttribute('data-champion-id');
-            if (!championId) return;
+            if (!championId) {
+                console.log('No se encontró el ID del campeón');
+                return;
+            }
+            
+            console.log(`Procesando campeón con ID: ${championId}`);
             
             const row = parseInt(cell.getAttribute('data-row') || '0');
             const col = parseInt(cell.getAttribute('data-col') || '0');
             
+            // Obtener el nivel de estrellas
             const levelElement = championCard.querySelector('.star-level');
-            const level = levelElement ? levelElement.textContent?.length || 1 : 1;
+            const starsText = levelElement?.textContent || '⭐';
+            const level = starsText.length;
+            console.log(`Nivel de estrellas: ${level} (texto: "${starsText}")`);
             
-            const costElement = championCard.querySelector('.cost-badge');
+            // Obtener el costo del campeón desde la lista de campeones
+            const championItem = document.querySelector(`.champion-item[data-item-id="${championId}"]`);
+            const costElement = championItem?.querySelector('p');
             const costMatch = costElement?.textContent?.match(/\d+/);
             const cost = costMatch ? parseInt(costMatch[0]) : 1;
+            console.log(`Costo del campeón: ${cost}`);
             
+            // Obtener los objetos del campeón
             const items: string[] = [];
-            championCard.querySelectorAll('.item-badge').forEach(itemBadge => {
-                const itemId = itemBadge.getAttribute('data-item-id');
-                if (itemId) items.push(itemId);
-            });
+            const itemsContainer = championCard.querySelector('.items-container');
+            if (itemsContainer) {
+                itemsContainer.querySelectorAll('img').forEach(itemImg => {
+                    const itemId = itemImg.getAttribute('data-item-id');
+                    if (itemId) {
+                        items.push(itemId);
+                        console.log(`Objeto encontrado: ${itemId}`);
+                    }
+                });
+            }
             
             composition.push({
                 id: championId,
@@ -94,8 +114,11 @@
                 position: { row, col },
                 items
             });
+            
+            console.log(`Campeón añadido a la composición: ${championId} en posición (${row},${col}) con ${items.length} objetos y nivel ${level}`);
         });
         
+        console.log('Composición actual:', composition);
         return composition;
     }
 
@@ -116,13 +139,29 @@
 
     // Función para guardar la composición actual
     function saveComposition() {
+        console.log('Iniciando guardado de composición');
         const composition = getCurrentComposition();
         
-        // Guardar en localStorage
-        localStorage.setItem('tft-composition', JSON.stringify(composition));
+        if (composition.length === 0) {
+            console.log('No hay campeones en el tablero para guardar');
+            showToast('No hay campeones en el tablero para guardar', true);
+            return;
+        }
         
-        // Mostrar feedback al usuario
-        showToast('Composición guardada correctamente');
+        // Guardar en localStorage
+        const compositionJson = JSON.stringify(composition);
+        console.log('Guardando en localStorage:', compositionJson);
+        localStorage.setItem('tft-composition', compositionJson);
+        
+        // Verificar que se guardó correctamente
+        const savedComp = localStorage.getItem('tft-composition');
+        if (savedComp) {
+            console.log('Composición guardada correctamente en localStorage');
+            showToast('Composición guardada correctamente');
+        } else {
+            console.error('Error al guardar la composición en localStorage');
+            showToast('Error al guardar la composición', true);
+        }
     }
     
     // Función para descargar la composición como JSON
@@ -159,25 +198,48 @@
     
     // Función para cargar la composición guardada en localStorage
     function loadComposition() {
+        console.log('Intentando cargar la composición desde localStorage');
         const storedComp = localStorage.getItem('tft-composition');
-        if (!storedComp) return;
+        
+        if (!storedComp) {
+            console.log('No hay composición guardada en localStorage');
+            return;
+        }
         
         try {
+            console.log('Composición encontrada en localStorage:', storedComp);
+            
             // Limpiar el tablero primero
             document.querySelectorAll('.hex-cell .hex-content').forEach(cell => {
                 cell.innerHTML = '';
             });
             
             const composition: StoredChampion[] = JSON.parse(storedComp);
+            console.log('Composición parseada:', composition);
             
-            composition.forEach(champion => {
+            if (composition.length === 0) {
+                console.log('La composición guardada está vacía');
+                return;
+            }
+            
+            console.log(`Cargando ${composition.length} campeones en el tablero`);
+            
+            composition.forEach((champion, index) => {
+                console.log(`Procesando campeón ${index + 1}/${composition.length}: ${champion.name}`);
+                
                 const { row, col } = champion.position;
                 const cell = document.querySelector(`.hex-cell[data-row="${row}"][data-col="${col}"]`);
                 
-                if (!cell) return;
+                if (!cell) {
+                    console.log(`No se encontró la celda en la posición ${row},${col}`);
+                    return;
+                }
                 
                 const hexContent = cell.querySelector('.hex-content');
-                if (!hexContent) return;
+                if (!hexContent) {
+                    console.log(`No se encontró el contenido de la celda en la posición ${row},${col}`);
+                    return;
+                }
                 
                 // Crear el campeón
                 const championCard = document.createElement('div');
@@ -191,15 +253,11 @@
                 img.className = 'w-10 h-10 sm:w-16 sm:h-16 rounded-full object-cover object-right';
                 img.setAttribute('data-champion-id', champion.id);
                 
-                // Crear estrellas
+                // Crear estrellas con el nivel correcto
                 const levelDiv = document.createElement('div');
                 levelDiv.className = 'star-level absolute -top-2 sm:-top-5 left-1/2 transform -translate-x-1/2 text-yellow-400 text-xs sm:text-base';
                 levelDiv.textContent = '⭐'.repeat(champion.level);
-                
-                // Crear badge de costo
-                const costDiv = document.createElement('div');
-                costDiv.className = 'cost-badge absolute -bottom-1 sm:-bottom-2 left-1/2 transform -translate-x-1/2 bg-gray-800 bg-opacity-80 rounded-full px-1 py-0.5 sm:px-2 sm:py-1 text-xs sm:text-sm flex items-center';
-                costDiv.innerHTML = `<span class="mr-1">🥮</span> ${champion.cost}`;
+                console.log(`Nivel de estrellas establecido a ${champion.level} para ${champion.name}`);
                 
                 // Crear controles
                 const controlsDiv = document.createElement('div');
@@ -227,27 +285,72 @@
                 // Agregar todo al campeón
                 championCard.appendChild(img);
                 championCard.appendChild(levelDiv);
-                championCard.appendChild(costDiv);
                 championCard.appendChild(controlsDiv);
                 
                 // Agregar ítems si existen
                 if (champion.items && champion.items.length > 0) {
+                    console.log(`Añadiendo ${champion.items.length} objetos al campeón ${champion.name}`);
+                    
+                    const itemsContainer = document.createElement('div');
+                    itemsContainer.className = 'items-container absolute -bottom-4 sm:-bottom-8 left-1/2 transform -translate-x-1/2 flex justify-center gap-1';
+                    
                     champion.items.forEach(itemId => {
-                        const itemBadge = document.createElement('div');
-                        itemBadge.className = 'item-badge absolute -right-1 sm:-right-2 -top-1 sm:-top-2 bg-gray-800 bg-opacity-80 rounded-full p-1 sm:p-2';
-                        itemBadge.setAttribute('data-item-id', itemId);
+                        console.log(`Añadiendo objeto ${itemId} al campeón ${champion.name}`);
+                        
+                        // Buscar el objeto en la lista para obtener su información
+                        const itemElement = document.querySelector(`.item-card[data-item-id="${itemId}"]`);
+                        let itemIcon = `/items/${itemId}.png`;
+                        let itemName = `Item ${itemId}`;
+                        
+                        if (itemElement) {
+                            const itemImg = itemElement.querySelector('img');
+                            if (itemImg) {
+                                itemIcon = itemImg.getAttribute('src') || itemIcon;
+                                itemName = itemImg.getAttribute('alt') || itemName;
+                            }
+                        }
                         
                         const itemImg = document.createElement('img');
-                        itemImg.src = `/items/${itemId}.png`;
-                        itemImg.alt = `Item ${itemId}`;
-                        itemImg.className = 'w-4 h-4 sm:w-6 sm:h-6 object-cover';
+                        itemImg.src = itemIcon;
+                        itemImg.alt = itemName;
+                        itemImg.title = itemName;
+                        itemImg.className = 'w-4 h-4 sm:w-6 sm:h-6 object-cover object-right border-2 border-yellow-400';
+                        itemImg.setAttribute('data-item-id', itemId);
                         
-                        itemBadge.appendChild(itemImg);
-                        championCard.appendChild(itemBadge);
+                        // Añadir evento para eliminar el objeto al hacer clic
+                        itemImg.addEventListener('click', function(e) {
+                            e.stopPropagation();
+                            itemImg.remove();
+                            
+                            // Si no quedan objetos, eliminar el contenedor
+                            if (itemsContainer && itemsContainer.children.length === 0) {
+                                itemsContainer.remove();
+                            }
+                        });
+                        
+                        itemsContainer.appendChild(itemImg);
                     });
+                    
+                    championCard.appendChild(itemsContainer);
                 }
                 
                 hexContent.appendChild(championCard);
+                
+                // Configurar los controles del campeón
+                setupChampionControls(championCard);
+                
+                // Mostrar controles al pasar el mouse
+                championCard.addEventListener('mouseenter', function() {
+                    const controls = championCard.querySelector('.champion-controls');
+                    if (controls) controls.classList.remove('opacity-0');
+                });
+                
+                championCard.addEventListener('mouseleave', function() {
+                    const controls = championCard.querySelector('.champion-controls');
+                    if (controls) controls.classList.add('opacity-0');
+                });
+                
+                console.log(`Campeón ${champion.name} cargado correctamente en la posición (${row},${col})`);
             });
             
             // Actualizar el estado visual
@@ -392,6 +495,75 @@
         showToast('Tablero limpiado correctamente');
     }
     
+    // Función para configurar los controles de un campeón
+    function setupChampionControls(championCard: Element) {
+        console.log('Configurando controles del campeón');
+        
+        const increaseBtn = championCard.querySelector('.increase-level');
+        const decreaseBtn = championCard.querySelector('.decrease-level');
+        const removeBtn = championCard.querySelector('.remove-champion');
+        const levelElement = championCard.querySelector('.star-level');
+        
+        console.log('Elementos encontrados:', {
+            increaseBtn: !!increaseBtn,
+            decreaseBtn: !!decreaseBtn,
+            removeBtn: !!removeBtn,
+            levelElement: !!levelElement
+        });
+        
+        // Solo establecer el nivel inicial a 1 si no hay texto (nuevo campeón)
+        if (levelElement && (!levelElement.textContent || levelElement.textContent.trim() === '')) {
+            levelElement.textContent = '⭐';
+            console.log('Nivel inicial establecido a 1 estrella para nuevo campeón');
+        } else if (levelElement) {
+            console.log(`Manteniendo nivel existente: ${levelElement.textContent}`);
+        }
+        
+        if (increaseBtn && levelElement) {
+            increaseBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const starsText = levelElement.textContent || '⭐';
+                const currentLevel = starsText.length;
+                console.log(`Aumentando nivel de ${currentLevel} a ${currentLevel + 1}`);
+                
+                if (currentLevel < 3) {
+                    levelElement.textContent = '⭐'.repeat(currentLevel + 1);
+                    console.log(`Nivel actualizado a ${currentLevel + 1} estrellas`);
+                } else {
+                    console.log('Ya está en el nivel máximo (3 estrellas)');
+                }
+            });
+        }
+        
+        if (decreaseBtn && levelElement) {
+            decreaseBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const starsText = levelElement.textContent || '⭐';
+                const currentLevel = starsText.length;
+                console.log(`Disminuyendo nivel de ${currentLevel} a ${currentLevel - 1}`);
+                
+                if (currentLevel > 1) {
+                    levelElement.textContent = '⭐'.repeat(currentLevel - 1);
+                    console.log(`Nivel actualizado a ${currentLevel - 1} estrellas`);
+                } else {
+                    console.log('Ya está en el nivel mínimo (1 estrella)');
+                }
+            });
+        }
+        
+        if (removeBtn) {
+            removeBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const hexContent = championCard.closest('.hex-content');
+                if (hexContent) {
+                    hexContent.innerHTML = '';
+                    updateChampionsVisualState();
+                    console.log('Campeón eliminado del tablero');
+                }
+            });
+        }
+    }
+
     // Evento para guardar la composición
     const saveBtn = document.getElementById('save-comp');
     if (saveBtn) {
@@ -415,4 +587,10 @@
     if (clearBtn) {
         clearBtn.addEventListener('click', clearBoard);
     }
+    
+    // Cargar la composición guardada al iniciar la página
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('DOM cargado, intentando cargar la composición guardada');
+        loadComposition();
+    });
 </script> 
