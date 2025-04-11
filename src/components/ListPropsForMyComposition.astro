@@ -83,7 +83,7 @@ const componentId = `list-${type}-${Math.random().toString(36).substring(2, 9)}`
                 class={`${type === 'champions' ? 'champion-item' : 'item-card'} bg-gray-700 p-2 rounded-lg cursor-pointer hover:bg-gray-600 transition-colors border-2 ${getBorderColor(item)}`}
                 draggable="true"
                 data-item-id={item.id}
-                data-name={item.name.toLowerCase()}
+                data-name={item.name?.toLowerCase() || ''}
                 data-index={index}
                 data-type={type}
                 style={index >= columns * rows ? "display: none;" : ""}
@@ -93,7 +93,7 @@ const componentId = `list-${type}-${Math.random().toString(36).substring(2, 9)}`
                         src={item.icon} 
                         alt={item.name}
                         class="w-10 h-10 rounded-full"
-                        onerror="this.src='https://ddragon.leagueoflegends.com/cdn/13.24.1/img/tft-item/1.png'"
+                        onerror="this.onerror=null; this.src='https://ddragon.leagueoflegends.com/cdn/14.1.1/img/champion/Aatrox.png'; console.log('Error al cargar imagen para', this.alt);"
                     />
                     <div>
                         <h3 class="font-semibold text-[1rem] leading-none">{item.name}</h3>

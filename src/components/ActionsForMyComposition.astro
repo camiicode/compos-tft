@@ -329,6 +329,11 @@
                         itemImg.title = itemName;
                         itemImg.className = 'w-4 h-4 sm:w-6 sm:h-6 object-cover object-right border-2 border-yellow-400';
                         itemImg.setAttribute('data-item-id', itemId);
+                        itemImg.onerror = function() {
+                            this.onerror = null;
+                            this.src = 'https://ddragon.leagueoflegends.com/cdn/14.1.1/img/item/1001.png';
+                            console.log('Error al cargar imagen para', this.alt);
+                        };
                         
                         // Añadir evento para eliminar el objeto al hacer clic
                         itemImg.addEventListener('click', function(e) {
@@ -489,6 +494,11 @@
                             itemImg.title = itemName;
                             itemImg.className = 'w-4 h-4 sm:w-6 sm:h-6 object-cover object-right border-2 border-yellow-400';
                             itemImg.setAttribute('data-item-id', itemId);
+                            itemImg.onerror = function() {
+                                this.onerror = null;
+                                this.src = 'https://ddragon.leagueoflegends.com/cdn/14.1.1/img/item/1001.png';
+                                console.log('Error al cargar imagen para', this.alt);
+                            };
                             
                             // Añadir evento para eliminar el objeto al hacer clic
                             itemImg.addEventListener('click', function(e) {

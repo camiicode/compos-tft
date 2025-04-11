@@ -122,19 +122,19 @@ for (let row = 0; row < 4; row++) {
         const boardCells = document.querySelectorAll('#board .hex-cell');
         
         // Función para verificar si un campeón ya está en el tablero
-        function isChampionOnBoard(championId: string): boolean {
+    function isChampionOnBoard(championId: string): boolean {
             const boardCells = document.querySelectorAll('#board .hex-content');
-            for (const cell of boardCells) {
-                const championCard = cell.querySelector('.champion-card');
-                if (championCard) {
-                    const img = championCard.querySelector('img');
-                    if (img && img.getAttribute('data-champion-id') === championId) {
-                        return true;
-                    }
+        for (const cell of boardCells) {
+            const championCard = cell.querySelector('.champion-card');
+            if (championCard) {
+                const img = championCard.querySelector('img');
+                if (img && img.getAttribute('data-champion-id') === championId) {
+                    return true;
                 }
             }
-            return false;
         }
+        return false;
+    }
 
         // Función para verificar si un objeto ya está equipado en un campeón
         function isItemEquippedOnChampion(championCard: Element, itemId: string): boolean {
@@ -159,25 +159,25 @@ for (let row = 0; row < 4; row++) {
         }
 
         // Función para actualizar el estado visual de los campeones
-        function updateChampionsVisualState(): void {
+    function updateChampionsVisualState(): void {
             console.log('Actualizando estado visual de campeones');
-            const championsList = document.querySelectorAll('.champion-item');
+        const championsList = document.querySelectorAll('.champion-item');
             console.log(`Encontrados ${championsList.length} campeones para actualizar`);
-            
-            championsList.forEach(card => {
+        
+        championsList.forEach(card => {
                 const championId = card.getAttribute('data-item-id');
-                if (championId && isChampionOnBoard(championId)) {
+            if (championId && isChampionOnBoard(championId)) {
                     console.log(`Campeón ${championId} ya está en el tablero`);
-                    card.classList.add('opacity-50');
-                    card.setAttribute('data-on-board', 'true');
-                    card.setAttribute('draggable', 'false');
-                } else {
-                    card.classList.remove('opacity-50');
-                    card.removeAttribute('data-on-board');
-                    card.setAttribute('draggable', 'true');
-                }
-            });
-        }
+                card.classList.add('opacity-50');
+                card.setAttribute('data-on-board', 'true');
+                card.setAttribute('draggable', 'false');
+            } else {
+                card.classList.remove('opacity-50');
+                card.removeAttribute('data-on-board');
+                card.setAttribute('draggable', 'true');
+            }
+        });
+    }
 
         // Configurar eventos de drag and drop para los elementos de la lista
         function setupDragAndDrop() {
@@ -185,7 +185,7 @@ for (let row = 0; row < 4; row++) {
             
             // Eventos para campeones y objetos de las listas
             document.addEventListener('dragstart', function(e: Event) {
-                const dragEvent = e as DragEvent;
+            const dragEvent = e as DragEvent;
                 const target = e.target as HTMLElement;
                 
                 if (!target || !dragEvent.dataTransfer) return;
@@ -201,10 +201,10 @@ for (let row = 0; row < 4; row++) {
                 // Si es un campeón y ya está en el tablero, evitar el arrastre
                 if (itemType === 'champions' && isChampionOnBoard(itemId)) {
                     console.log(`Campeón ${itemId} ya está en el tablero, cancelando arrastre`);
-                    dragEvent.preventDefault();
-                    return;
-                }
-                
+                dragEvent.preventDefault();
+                return;
+            }
+            
                 // Configurar datos para el arrastre
                 dragEvent.dataTransfer.setData('text/plain', JSON.stringify({
                     id: itemId,
@@ -223,14 +223,14 @@ for (let row = 0; row < 4; row++) {
             });
         }
 
-        // Función para gestionar los controles del campeón
-        function setupChampionControls(championCard: Element) {
+    // Función para gestionar los controles del campeón
+    function setupChampionControls(championCard: Element) {
             console.log('Configurando controles del campeón');
             
-            const increaseBtn = championCard.querySelector('.increase-level');
-            const decreaseBtn = championCard.querySelector('.decrease-level');
-            const removeBtn = championCard.querySelector('.remove-champion');
-            const levelElement = championCard.querySelector('.star-level');
+        const increaseBtn = championCard.querySelector('.increase-level');
+        const decreaseBtn = championCard.querySelector('.decrease-level');
+        const removeBtn = championCard.querySelector('.remove-champion');
+        const levelElement = championCard.querySelector('.star-level');
             
             console.log('Elementos encontrados:', {
                 increaseBtn: !!increaseBtn,
@@ -244,51 +244,51 @@ for (let row = 0; row < 4; row++) {
                 levelElement.textContent = '⭐';
                 console.log('Nivel inicial establecido a 1 estrella');
             }
-            
-            if (increaseBtn && levelElement) {
-                increaseBtn.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    const starsText = levelElement.textContent || '⭐';
-                    const currentLevel = starsText.length;
+        
+        if (increaseBtn && levelElement) {
+            increaseBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const starsText = levelElement.textContent || '⭐';
+                const currentLevel = starsText.length;
                     console.log(`Aumentando nivel de ${currentLevel} a ${currentLevel + 1}`);
                     
-                    if (currentLevel < 3) {
-                        levelElement.textContent = '⭐'.repeat(currentLevel + 1);
+                if (currentLevel < 3) {
+                    levelElement.textContent = '⭐'.repeat(currentLevel + 1);
                         console.log(`Nivel actualizado a ${currentLevel + 1} estrellas`);
                     } else {
                         console.log('Ya está en el nivel máximo (3 estrellas)');
-                    }
-                });
-            }
-            
-            if (decreaseBtn && levelElement) {
-                decreaseBtn.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    const starsText = levelElement.textContent || '⭐';
-                    const currentLevel = starsText.length;
+                }
+            });
+        }
+        
+        if (decreaseBtn && levelElement) {
+            decreaseBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const starsText = levelElement.textContent || '⭐';
+                const currentLevel = starsText.length;
                     console.log(`Disminuyendo nivel de ${currentLevel} a ${currentLevel - 1}`);
                     
-                    if (currentLevel > 1) {
-                        levelElement.textContent = '⭐'.repeat(currentLevel - 1);
+                if (currentLevel > 1) {
+                    levelElement.textContent = '⭐'.repeat(currentLevel - 1);
                         console.log(`Nivel actualizado a ${currentLevel - 1} estrellas`);
                     } else {
                         console.log('Ya está en el nivel mínimo (1 estrella)');
-                    }
-                });
-            }
-            
-            if (removeBtn) {
-                removeBtn.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    const hexContent = championCard.closest('.hex-content');
-                    if (hexContent) {
-                        hexContent.innerHTML = '';
-                        updateChampionsVisualState();
-                        console.log('Campeón eliminado del tablero');
-                    }
-                });
-            }
+                }
+            });
         }
+        
+        if (removeBtn) {
+            removeBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const hexContent = championCard.closest('.hex-content');
+                if (hexContent) {
+                    hexContent.innerHTML = '';
+                    updateChampionsVisualState();
+                        console.log('Campeón eliminado del tablero');
+                }
+            });
+        }
+    }
 
         // Función para añadir un objeto a un campeón
         function addItemToChampion(championCard: Element, itemId: string, itemName: string, itemIcon: string) {
@@ -310,10 +310,10 @@ for (let row = 0; row < 4; row++) {
             let itemsContainer = championCard.querySelector('.items-container');
             if (!itemsContainer) {
                 itemsContainer = document.createElement('div');
-                itemsContainer.className = 'items-container absolute -bottom-4 sm:-bottom-8 left-1/2 transform -translate-x-1/2 flex justify-center gap-1';
-                championCard.appendChild(itemsContainer);
-            }
-            
+                            itemsContainer.className = 'items-container absolute -bottom-4 sm:-bottom-8 left-1/2 transform -translate-x-1/2 flex justify-center gap-1';
+                            championCard.appendChild(itemsContainer);
+                        }
+                        
             // Crear el elemento del objeto
             const itemElement = document.createElement('img');
             itemElement.src = itemIcon;
@@ -361,10 +361,10 @@ for (let row = 0; row < 4; row++) {
                 try {
                     const data = JSON.parse(dragEvent.dataTransfer.getData('text/plain'));
                     console.log('Datos recibidos en drop:', data);
-                    
-                    const hexContent = cell.querySelector('.hex-content');
-                    if (!hexContent) return;
-                    
+                
+                const hexContent = cell.querySelector('.hex-content');
+                if (!hexContent) return;
+                
                     // Obtener el elemento arrastrado
                     const itemType = data.type;
                     const itemId = data.id;
@@ -403,6 +403,7 @@ for (let row = 0; row < 4; row++) {
                                     title="${championName}"
                                     data-champion-id="${itemId}"
                                     class="w-10 h-10 sm:w-16 sm:h-16 rounded-full object-cover object-right"
+                                    onerror="this.onerror=null; this.src='https://ddragon.leagueoflegends.com/cdn/14.1.1/img/champion/Aatrox.png'; console.log('Error al cargar imagen para', this.alt);"
                                 />
                                 <div class="star-level absolute -top-2 sm:-top-5 left-1/2 transform -translate-x-1/2 text-yellow-400 text-xs sm:text-base">
                                     ⭐
@@ -466,11 +467,11 @@ for (let row = 0; row < 4; row++) {
                             console.error('No se pudo encontrar el elemento champion-card después de crearlo');
                         }
                         
-                        // Actualizar el estado visual de los campeones
+        // Actualizar el estado visual de los campeones
                         updateChampionsVisualState();
                     } else if (itemType === 'objects') {
                         // Verificar si hay un campeón en la celda
-                        const championCard = hexContent.querySelector('.champion-card');
+                const championCard = hexContent.querySelector('.champion-card');
                         if (!championCard) {
                             console.log('No hay campeón en esta celda, no se puede añadir un objeto');
                             return;
