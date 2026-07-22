@@ -10,8 +10,8 @@
   },
   "dependencies": {
     "@astrojs/tailwind": "^6.0.2",
-    "astro": "^7.0.2",
-    "axios": "^1.18.0",
+    "astro": "^7.1.0",
+    "axios": "^1.18.1",
     "tailwindcss": "^3.4.17"
   }
 }
